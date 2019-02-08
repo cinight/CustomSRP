@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEditor.ProjectWindowCallback;
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEditor.ProjectWindowCallback;
 #endif
 
 namespace SRP0103
