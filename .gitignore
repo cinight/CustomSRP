@@ -34,3 +34,5 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+.vscode/settings.json
+Logs/Packages-Update.log
