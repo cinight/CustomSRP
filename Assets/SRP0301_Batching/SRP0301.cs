@@ -59,6 +59,8 @@ public class SRP0301Instance : RenderPipeline
             //Setup DrawSettings and FilterSettings
             var sortingSettings = new SortingSettings(camera);
             DrawingSettings drawSettings = new DrawingSettings(m_PassName, sortingSettings);
+            drawSettings.enableDynamicBatching = true; //This is false by-default
+            drawSettings.enableInstancing = true; //This is true by-default
             FilteringSettings filterSettings = new FilteringSettings(RenderQueueRange.all);
 
             //Skybox
