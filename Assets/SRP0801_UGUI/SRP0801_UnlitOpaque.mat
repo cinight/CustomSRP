@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SRP0401_UnlitOpaque
-  m_Shader: {fileID: 4800000, guid: 0f56401ba9b8eaf45acbe18a97f3ef9e, type: 3}
+  m_Name: SRP0801_UnlitOpaque
+  m_Shader: {fileID: 4800000, guid: 071b19b5c8135f24e8fc5299a9fcc0f5, type: 3}
   m_ShaderKeywords: _EMISSION _METALLICGLOSSMAP
   m_LightmapFlags: 1
   m_EnableInstancingVariants: 0
