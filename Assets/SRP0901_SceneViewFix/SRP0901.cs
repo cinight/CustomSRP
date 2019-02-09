@@ -24,11 +24,6 @@ public class SRP0901Instance : RenderPipeline
 {
     private static readonly ShaderTagId m_PassName = new ShaderTagId("SRP0901_Pass"); //The shader pass tag just for SRP0901
 
-    //SceneView requires proper depth texture
-    private static Material m_CopyDepthMaterial; //For blitting the depth buffer
-    private static int m_DepthRTid = Shader.PropertyToID("_CameraDepthTexture");
-    private static RenderTargetIdentifier m_DepthRT = new RenderTargetIdentifier(m_DepthRTid);
-
     public SRP0901Instance()
     {
     }
@@ -37,13 +32,11 @@ public class SRP0901Instance : RenderPipeline
     {
         BeginFrameRendering(cameras);
 
-        //SetUp materials
-        if (m_CopyDepthMaterial == null) m_CopyDepthMaterial = new Material ( Shader.Find ( "Hidden/CustomSRP/SRP0901/CopyDepth"));
-
         foreach (Camera camera in cameras)
         {
             #if UNITY_EDITOR
             bool isSceneViewCam = camera.cameraType == CameraType.SceneView;
+            if(isSceneViewCam) ScriptableRenderContext.EmitWorldGeometryForSceneView(camera); //This makes the UI Canvas geometry appear on scene view
             #endif
 
             BeginCameraRendering(camera);
@@ -62,34 +55,17 @@ public class SRP0901Instance : RenderPipeline
             bool clearDepth = camera.clearFlags == CameraClearFlags.Nothing? false : true;
             bool clearColor = camera.clearFlags == CameraClearFlags.Color? true : false;
 
+            //Setup DrawSettings and FilterSettings
+            var sortingSettings = new SortingSettings(camera);
+            DrawingSettings drawSettings = new DrawingSettings(m_PassName, sortingSettings);
+            FilteringSettings filterSettings = new FilteringSettings(RenderQueueRange.all);
+
             //Camera clear flag
             CommandBuffer cmd = new CommandBuffer();
             cmd.name = "Cam:"+camera.name+" ClearFlag";
             cmd.ClearRenderTarget(clearDepth, clearColor, camera.backgroundColor);
             context.ExecuteCommandBuffer(cmd);
             cmd.Release();
-
-            //Setup DrawSettings and FilterSettings
-            var sortingSettings = new SortingSettings(camera);
-            DrawingSettings drawSettings = new DrawingSettings(m_PassName, sortingSettings);
-            FilteringSettings filterSettings = new FilteringSettings(RenderQueueRange.all);
-
-            //Setup RenderTexture for the Depth
-            #if UNITY_EDITOR
-            if(isSceneViewCam)
-            {
-                RenderTextureDescriptor depthRTDesc = new RenderTextureDescriptor(camera.pixelWidth, camera.pixelHeight);
-                depthRTDesc.colorFormat = RenderTextureFormat.Depth;
-                depthRTDesc.depthBufferBits = 32;
-
-                CommandBuffer cmdTempId = new CommandBuffer();
-                cmdTempId.GetTemporaryRT(m_DepthRTid, depthRTDesc,FilterMode.Bilinear);
-                cmdTempId.SetRenderTarget(BuiltinRenderTextureType.CameraTarget,m_DepthRT);
-                cmdTempId.ClearRenderTarget(true, true, Color.black);
-                context.ExecuteCommandBuffer(cmdTempId);
-                cmdTempId.Release();
-            }
-            #endif
 
             //Skybox
             if(drawSkyBox)  {  context.DrawSkybox(camera);  }
@@ -104,20 +80,11 @@ public class SRP0901Instance : RenderPipeline
             filterSettings.renderQueueRange = RenderQueueRange.transparent;
             context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
 
-            //SceneView fix, so that it draws the gizmos
+            //SceneView fix, so that it draws the gizmos on scene view
             #if UNITY_EDITOR
             if (isSceneViewCam)
             {
-                //Provide depth to sceneview camera
-                CommandBuffer cmdSceneViewFix = new CommandBuffer();
-                //cmdSceneViewFix.ClearRenderTarget(clearDepth, clearColor, camera.backgroundColor);
-                cmdSceneViewFix.SetGlobalTexture(m_DepthRTid, m_DepthRT);
-                cmdSceneViewFix.Blit(m_DepthRT, BuiltinRenderTextureType.CameraTarget, m_CopyDepthMaterial);
-                context.ExecuteCommandBuffer(cmdSceneViewFix);
-                cmdSceneViewFix.Clear();
-                cmdSceneViewFix.ReleaseTemporaryRT(m_DepthRTid); //cleanup
-                context.ExecuteCommandBuffer(cmdSceneViewFix);
-                cmdSceneViewFix.Release();
+                context.DrawGizmos(camera, GizmoSubset.PostImageEffects);
             }
             #endif
 
