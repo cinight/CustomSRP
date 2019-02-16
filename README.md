@@ -16,6 +16,8 @@ Win DX11 Gamma
 | `SRP0202_OcclusionCulling` | ![](READMEImages/SRP0202_OcclusionCulling.gif) | Baked Occlusion Culling |
 | `SRP0301_Batching` | ![](READMEImages/SRP0301_Batching.JPG) | Use Static Batching, Dynamic Batching, GPU Instancing and SRP Batcher |
 | `SRP0401_NoSpecificPass` | ![](READMEImages/SRP0401_NoSpecificPass.JPG) | To draw the shaders that do not have a tag, e.g. default Unlit shaders |
+| `SRP0501_SoftParticle` | ![](READMEImages/SRP0501_SoftParticle.JPG) | Setup CameraDepthTexture to achieve soft-particle effect |
+| `SRP0502_Distortion` | ![](READMEImages/SRP0502_Distortion.gif) | No more grab pass but we can implement our own |
 | `SRP0701_HDR_MSAA` | ![](READMEImages/SRP0701_HDR_MSAA.gif) | Use HDR and MSAA |
 | `SRP0702_Postprocessing` | ![](READMEImages/SRP0702_Postprocessing.gif) | This shows you how to use Postprocessing Stack with SRP (transparent effects e.g. Bloom, Depth of Field) |
 | `SRP0801_UGUI` | ![](READMEImages/SRP0801_UGUI.JPG) | Use UICamera to render UGUI, also render 3D objects and particle on UI |
