@@ -61,7 +61,7 @@ public class SRP0502Instance : RenderPipeline
             RenderTextureDescriptor colorRTDesc = new RenderTextureDescriptor(camera.pixelWidth, camera.pixelHeight);
             colorRTDesc.graphicsFormat = m_ColorFormat;
             colorRTDesc.depthBufferBits = depthBufferBits;
-            //colorRTDesc.sRGB = ;
+            colorRTDesc.sRGB = (QualitySettings.activeColorSpace == ColorSpace.Linear);
             colorRTDesc.msaaSamples = 1;
             colorRTDesc.enableRandomWrite = false;
 

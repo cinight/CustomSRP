@@ -72,7 +72,7 @@ public class SRP0702Instance : RenderPipeline
             RenderTextureDescriptor colorRTDesc = new RenderTextureDescriptor(camera.pixelWidth, camera.pixelHeight);
             colorRTDesc.graphicsFormat = m_ColorFormatActive;
             colorRTDesc.depthBufferBits = depthBufferBits;
-            //colorRTDesc.sRGB = ;
+            colorRTDesc.sRGB = (QualitySettings.activeColorSpace == ColorSpace.Linear);
             colorRTDesc.msaaSamples = camera.allowMSAA ? QualitySettings.antiAliasing : 1;
             colorRTDesc.enableRandomWrite = false;
             cmdTempId.GetTemporaryRT(m_ColorRTid, colorRTDesc,FilterMode.Bilinear);
