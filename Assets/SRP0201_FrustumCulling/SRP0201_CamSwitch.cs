@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SRP0104_CamSwitch : MonoBehaviour
+public class SRP0201_CamSwitch : MonoBehaviour
 {
     public GameObject[] cameras;
 

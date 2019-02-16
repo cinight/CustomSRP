@@ -3,26 +3,26 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 [ExecuteInEditMode]
-public class SRP0104 : RenderPipelineAsset
+public class SRP0201 : RenderPipelineAsset
 {
     #if UNITY_EDITOR
-    [UnityEditor.MenuItem("Assets/Create/Render Pipeline/SRP0104", priority = 1)]
-    static void CreateSRP0104()
+    [UnityEditor.MenuItem("Assets/Create/Render Pipeline/SRP0201", priority = 1)]
+    static void CreateSRP0201()
     {
-        var instance = ScriptableObject.CreateInstance<SRP0104>();
-        UnityEditor.AssetDatabase.CreateAsset(instance, "Assets/SRP0104.asset");
+        var instance = ScriptableObject.CreateInstance<SRP0201>();
+        UnityEditor.AssetDatabase.CreateAsset(instance, "Assets/SRP0201.asset");
     }
     #endif
 
     protected override RenderPipeline CreatePipeline()
     {
-        return new SRP0104Instance();
+        return new SRP0201Instance();
     }
 }
 
-public class SRP0104Instance : RenderPipeline
+public class SRP0201Instance : RenderPipeline
 {
-    private static readonly ShaderTagId m_PassName = new ShaderTagId("SRP0104_Pass"); //The shader pass tag just for SRP0104
+    private static readonly ShaderTagId m_PassName = new ShaderTagId("SRP0201_Pass"); //The shader pass tag just for SRP0201
     private static readonly ShaderTagId m_PassNameDefault = new ShaderTagId("SRPDefaultUnlit"); //The shader pass tag for replacing shaders without pass
 
     //Scene Object Lists
@@ -31,7 +31,7 @@ public class SRP0104Instance : RenderPipeline
     public static Light[] lights;
     public static ReflectionProbe[] reflprobes;
 
-    public SRP0104Instance()
+    public SRP0201Instance()
     {
     }
 

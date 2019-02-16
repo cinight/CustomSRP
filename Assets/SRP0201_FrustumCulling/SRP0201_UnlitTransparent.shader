@@ -1,4 +1,4 @@
-﻿Shader "CustomSRP/SRP0104/UnlitTransparent"
+﻿Shader "CustomSRP/SRP0201/UnlitTransparent"
 {
 	Properties
 	{
@@ -13,7 +13,7 @@
 
 		Pass
 		{
-			Tags { "LightMode" = "SRP0104_Pass" }
+			Tags { "LightMode" = "SRP0201_Pass" }
 
 			CGPROGRAM
 			#pragma vertex vert

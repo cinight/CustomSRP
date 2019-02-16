@@ -10,5 +10,5 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7a6f92b682543374ba642dcd92f59577, type: 3}
-  m_Name: SRP0104_Asset
+  m_Name: SRP0201_Asset
   m_EditorClassIdentifier: 
