@@ -20,4 +20,40 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/SRP0103_CustomGUI/SRP0103_CustomGUI.unity
     guid: 6fb9b2adfa3f05c4e90b73faec914dee
+  - enabled: 1
+    path: Assets/SRP0201_FrustumCulling/SRP0201_FrustumCulling.unity
+    guid: e854aa057d113fe49969cde13649ba73
+  - enabled: 1
+    path: Assets/SRP0202_OcclusionCulling/SRP0202_OcclusionCulling.unity
+    guid: 4001e0b6193b7454aac24b32dc4bd874
+  - enabled: 1
+    path: Assets/SRP0301_Batching/SRP0301_Batching.unity
+    guid: fb75decb166a6b24ebba64fb6187eb31
+  - enabled: 1
+    path: Assets/SRP0401_NoSpecificPass/SRP0401_NoSpecificPass.unity
+    guid: 966491527f2baa447a0544f89eb37a48
+  - enabled: 1
+    path: Assets/SRP0501_SoftParticle/SRP0501_SoftParticle.unity
+    guid: 7d62423e1259f5c489f0d45b0a483f25
+  - enabled: 1
+    path: Assets/SRP0502_Distortion/SRP0502_Distortion.unity
+    guid: 1815eabba3eaa6b49bae06a2520b2b63
+  - enabled: 1
+    path: Assets/SRP0701_HDR_MSAA/SRP0701_HDR_MSAA.unity
+    guid: f45d7d050c77835498ef30aa0fcbfb0c
+  - enabled: 1
+    path: Assets/SRP0702_Postprocessing/SRP0702_Postprocessing.unity
+    guid: 8afbb6c78bcd6d14ea291d502bfa098f
+  - enabled: 1
+    path: Assets/SRP0703_MotionVector/SRP0703_MotionVector.unity
+    guid: 9149683ace496934c82cee79a7f32705
+  - enabled: 1
+    path: Assets/SRP0801_UGUI/SRP0801_UGUI.unity
+    guid: a7aa9f666a05202489b88edbcdf1b6f4
+  - enabled: 1
+    path: Assets/SRP0901_SceneViewFix/SRP0901_SceneViewFix.unity
+    guid: 54a6cb2e9384a304fa790d093205f5e3
+  - enabled: 1
+    path: Assets/SRP1001_Error/SRP1001_Error.unity
+    guid: 1032ee5d05f3d7949890a056eecac378
   m_configObjects: {}
