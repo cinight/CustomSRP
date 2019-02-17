@@ -29,7 +29,10 @@ public class SRP1001Instance : RenderPipeline
 
     public SRP1001Instance()
     {
-        errorMaterial = new Material(Shader.Find("Hidden/InternalErrorShader"));
+        errorMaterial = new Material(Shader.Find("Hidden/InternalErrorShader"))
+        {
+            hideFlags = HideFlags.HideAndDontSave
+        };
         m_LegacyShaderPassNames = new List<ShaderTagId>()
         {
             new ShaderTagId("Always"),
