@@ -1,5 +1,4 @@
 ﻿#pragma kernel CSMain
-#include "UnityCG.cginc"
 
 RWTexture2D<float4> _CameraColorTexture;
 Texture2D<float4> _CameraDepthTexture;
