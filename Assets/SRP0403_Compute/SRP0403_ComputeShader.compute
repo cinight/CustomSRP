@@ -1,0 +1,45 @@
+﻿#pragma kernel CSMain
+#include "UnityCG.cginc"
+
+RWTexture2D<float4> _CameraColorTexture;
+Texture2D<float4> _CameraDepthTexture;
+float detect;
+int range;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	float diff = 0;
+	float4 self = _CameraDepthTexture[id.xy];
+
+	uint2 mid = id.xy;
+
+	mid.x = id.x-range;
+	mid.y = id.y;
+	float4 left = _CameraDepthTexture[mid];
+	diff += abs(distance(self,left));
+
+	mid.x = id.x+range;
+	mid.y = id.y;
+	float4 right = _CameraDepthTexture[mid];
+	diff += abs(distance(self,right));
+
+	mid.x = id.x;
+	mid.y = id.y+range;
+	float4 up = _CameraDepthTexture[mid];
+	diff += abs(distance(self,up));
+
+	mid.x = id.x;
+	mid.y = id.y-range;
+	float4 down = _CameraDepthTexture[mid];
+	diff += abs(distance(self,down));
+
+	diff = detect * diff;
+
+	float4 edge = 1;
+	edge.rgb = 1-diff;
+
+	//if(diff > 0.05) _CameraColorTexture[id.xy] = float4(0,1,0,1);
+	_CameraColorTexture[id.xy] *= edge;
+
+}

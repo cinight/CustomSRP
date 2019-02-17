@@ -31,7 +31,7 @@ public class SRP0501Instance : RenderPipeline
 
     public SRP0501Instance()
     {
-        depthOnlyMaterial = new Material(Shader.Find("Hidden/CustomSRP/SRP0702/DepthOnly"));
+        depthOnlyMaterial = new Material(Shader.Find("Hidden/CustomSRP/SRP0501/DepthOnly"));
     }
 
     protected override void Render(ScriptableRenderContext context, Camera[] cameras)
