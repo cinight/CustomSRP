@@ -1,4 +1,4 @@
-﻿Shader "CustomSRP/SRP0802/RenderPass"
+﻿Shader "CustomSRP/SRP0802/RenderPass UnlitTransparent"
 {
 	Properties
 	{
@@ -6,7 +6,9 @@
 	}
 	SubShader
 	{
-		Tags { "RenderType"="Opaque" }
+		Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
+		Cull Off Lighting Off ZWrite Off
+		Blend SrcAlpha OneMinusSrcAlpha
 
 		Pass
 		{
@@ -55,7 +57,9 @@
 				o.Emission = frac(float4(_Time.x, _Time.y, _Time.z, _Time.w));
 				o.Emission.xy *= i.uv;
 				o.Emission.zw *= i.uv;
-				
+
+				o.Emission = 1-o.Emission; //just want a different color for transparent objects..
+
 				return o;
 			}
 			ENDCG
@@ -92,7 +96,7 @@
 			UNITY_DECLARE_FRAMEBUFFER_INPUT_FLOAT(0);
 			UNITY_DECLARE_FRAMEBUFFER_INPUT_FLOAT(1);
 
-			float4 frag (v2f i) : SV_Target
+			float4 frag (v2f i) : SV_Target0
 			{
 				float4 albedo = UNITY_READ_FRAMEBUFFER_INPUT(0, i.vertex.xyz);
 				float4 emission = UNITY_READ_FRAMEBUFFER_INPUT(1, i.vertex.xyz);
