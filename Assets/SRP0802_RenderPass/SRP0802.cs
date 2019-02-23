@@ -31,14 +31,13 @@ public class SRP0802Instance : RenderPipeline
     private static RenderTargetIdentifier m_ColorRT = new RenderTargetIdentifier(m_ColorRTid);
     private int depthBufferBits = 24;
 
-    //private static Material copyColorMaterial;
+    AttachmentDescriptor m_Albedo = new AttachmentDescriptor(m_ColorFormat);
+    AttachmentDescriptor m_Emission = new AttachmentDescriptor(m_ColorFormat);
+    AttachmentDescriptor m_Output = new AttachmentDescriptor(m_ColorFormat);
+    AttachmentDescriptor m_Depth = new AttachmentDescriptor(RenderTextureFormat.Depth);
 
     public SRP0802Instance()
     {
-        // copyColorMaterial = new Material(Shader.Find("Hidden/CustomSRP/SRP0802/CopyColor"))
-        // {
-        //     hideFlags = HideFlags.HideAndDontSave
-        // };
     }
 
     protected override void Render(ScriptableRenderContext context, Camera[] cameras)
@@ -67,7 +66,7 @@ public class SRP0802Instance : RenderPipeline
             RenderTextureDescriptor colorRTDesc = new RenderTextureDescriptor(camera.pixelWidth, camera.pixelHeight);
             colorRTDesc.colorFormat = m_ColorFormat;
             colorRTDesc.depthBufferBits = depthBufferBits;
-            //colorRTDesc.sRGB = (QualitySettings.activeColorSpace == ColorSpace.Linear);
+            colorRTDesc.sRGB = (QualitySettings.activeColorSpace == ColorSpace.Linear);
             colorRTDesc.msaaSamples = 1;
             colorRTDesc.enableRandomWrite = false;
 
@@ -75,8 +74,7 @@ public class SRP0802Instance : RenderPipeline
             CommandBuffer cmdTempId = new CommandBuffer();
             cmdTempId.name = "("+camera.name+")"+ "Setup TempRT";
             cmdTempId.GetTemporaryRT(m_ColorRTid, colorRTDesc,FilterMode.Bilinear);
-            cmdTempId.SetRenderTarget(m_ColorRT);
-            //cmdTempId.ClearRenderTarget(clearDepth, clearColor, camera.backgroundColor);
+            cmdTempId.SetRenderTarget(m_ColorRT); //so that result won't flip
             context.ExecuteCommandBuffer(cmdTempId);
             cmdTempId.Release();
 
@@ -86,40 +84,29 @@ public class SRP0802Instance : RenderPipeline
             DrawingSettings drawSettings2 = new DrawingSettings(m_PassName2, sortingSettings);
             FilteringSettings filterSettings = new FilteringSettings(RenderQueueRange.all);
 
-            AttachmentDescriptor m_Albedo = new AttachmentDescriptor(m_ColorFormat);
-            AttachmentDescriptor m_Emission = new AttachmentDescriptor(m_ColorFormat);
-            AttachmentDescriptor m_Combine = new AttachmentDescriptor(m_ColorFormat);
-            m_Combine.ConfigureTarget(m_ColorRT, false, true);
-            //AttachmentDescriptor m_Output = new AttachmentDescriptor(m_ColorFormat);
-            AttachmentDescriptor m_Depth = new AttachmentDescriptor(RenderTextureFormat.Depth);
-            
-
             //Native Arrays for Attachaments
             NativeArray<AttachmentDescriptor> renderPassAttachments = new NativeArray<AttachmentDescriptor>(4, Allocator.Temp);
             renderPassAttachments[0] = m_Albedo;
             renderPassAttachments[1] = m_Emission;
-            renderPassAttachments[2] = m_Combine;
-            //renderPassAttachments[3] = m_Output;
+            renderPassAttachments[2] = m_Output;
             renderPassAttachments[3] = m_Depth;
             NativeArray<int> renderPassColorAttachments = new NativeArray<int>(2, Allocator.Temp);
             renderPassColorAttachments[0] = 0;
             renderPassColorAttachments[1] = 1;
-            NativeArray<int> renderPassCombineAttachments = new NativeArray<int>(1, Allocator.Temp);
-            renderPassCombineAttachments[0] = 2;
-            //NativeArray<int> renderPassOutputAttachments = new NativeArray<int>(1, Allocator.Temp);
-            //renderPassOutputAttachments[0] = 3;
+            NativeArray<int> renderPassOutputAttachments = new NativeArray<int>(1, Allocator.Temp);
+            renderPassOutputAttachments[0] = 2;
 
-            // Camera clear flag
+            //Clear Attachements
+            m_Output.ConfigureTarget(m_ColorRT, false, true);
+            m_Output.ConfigureClear(new Color(0.0f, 0.0f, 0.0f, 0.0f),1,0);
             m_Albedo.ConfigureClear(camera.backgroundColor,1,0);
             m_Emission.ConfigureClear(new Color(0.0f, 0.0f, 0.0f, 0.0f),1,0);
             m_Depth.ConfigureClear(new Color(),1,0);
-            m_Combine.ConfigureClear(new Color(0.0f, 0.0f, 0.0f, 0.0f),1,0);
-            //m_Output.ConfigureClear(Color.black,1,0);
             
-            //If we want to use the old way, we can use ScopedRenderPass
-            //using (context.BeginScopedRenderPass(...)) { ... }
+            //More clean to use ScopedRenderPass instead of BeginRenderPass+EndRenderPass
             using ( context.BeginScopedRenderPass(camera.pixelWidth, camera.pixelHeight,1,renderPassAttachments, 3) )
             {
+                //Output to Albedo & Emission
                 using ( context.BeginScopedSubPass(renderPassColorAttachments,false) )
                 {
                     //Opaque objects
@@ -134,7 +121,8 @@ public class SRP0802Instance : RenderPipeline
                     filterSettings.renderQueueRange = RenderQueueRange.transparent;
                     context.DrawRenderers(cull, ref drawSettings1, ref filterSettings);
                 }
-                using ( context.BeginScopedSubPass(renderPassCombineAttachments,renderPassColorAttachments) )
+                //Read from Albedo & Emission, then output to Output
+                using ( context.BeginScopedSubPass(renderPassOutputAttachments,renderPassColorAttachments) )
                 {
                     //Skybox
                     if(drawSkyBox)  {  context.DrawSkybox(camera);  }
@@ -151,20 +139,16 @@ public class SRP0802Instance : RenderPipeline
                     filterSettings.renderQueueRange = RenderQueueRange.transparent;
                     context.DrawRenderers(cull, ref drawSettings2, ref filterSettings);
                 }
-                // using ( context.BeginScopedSubPass(renderPassOutputAttachments,renderPassCombineAttachments) )
-                // {
-                //     //Blit back to CameraTarget
-
-                // }
             }
 
+            //Blit To Camera so that the CameraTarget has content and make sceneview works
             CommandBuffer cmd = new CommandBuffer();
-            cmd.name = "Cam:"+camera.name+" BlitToColorTexture";
+            cmd.name = "Cam:"+camera.name+" BlitToCamera";
             cmd.Blit(m_ColorRT,BuiltinRenderTextureType.CameraTarget);
             context.ExecuteCommandBuffer(cmd);
             cmd.Release(); 
 
-            //CleanUp
+            //CleanUp Texture
             CommandBuffer cmdclean = new CommandBuffer();
             cmdclean.name = "("+camera.name+")"+ "Clean Up";
             cmdclean.ReleaseTemporaryRT(m_ColorRTid);
@@ -174,13 +158,10 @@ public class SRP0802Instance : RenderPipeline
             //Submit the CommandBuffers
             context.Submit();
 
-            //CleanUp
+            //CleanUp NativeArrays
             renderPassAttachments.Dispose();
             renderPassColorAttachments.Dispose();
-            renderPassCombineAttachments.Dispose();
-            //renderPassOutputAttachments.Dispose();
-
-            
+            renderPassOutputAttachments.Dispose();
         }
     }
 }
