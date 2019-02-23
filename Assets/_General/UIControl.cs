@@ -20,14 +20,18 @@ public class UIControl : MonoBehaviour
         float w = 500 * scale, h = 90 * scale;
         GUILayout.BeginArea(new Rect(Screen.width - w, Screen.height - h, w, h), GUI.skin.box);
 
+        Debug.Log(Screen.width + " " + Screen.height);
+
+        int currentpage = SceneManager.GetActiveScene().buildIndex +1;
+        GUILayout.Label( currentpage + " / " + SceneManager.sceneCountInBuildSettings + " " + SceneManager.GetActiveScene().name );
+
         GUILayout.BeginHorizontal();
         GUI.backgroundColor = new Color(1, 1, 1, .80f);
         if(GUILayout.Button("\n Prev \n")) PrevScene();
         if(GUILayout.Button("\n Next \n")) NextScene();
         GUILayout.EndHorizontal();
 
-        int currentpage = SceneManager.GetActiveScene().buildIndex +1;
-        GUILayout.Label( currentpage + " / " + SceneManager.sceneCountInBuildSettings + " " + SceneManager.GetActiveScene().name );
+
 
         GUILayout.EndArea();
     }
