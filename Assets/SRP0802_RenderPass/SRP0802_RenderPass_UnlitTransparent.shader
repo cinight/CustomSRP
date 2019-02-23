@@ -96,7 +96,7 @@
 			UNITY_DECLARE_FRAMEBUFFER_INPUT_FLOAT(0);
 			UNITY_DECLARE_FRAMEBUFFER_INPUT_FLOAT(1);
 
-			float4 frag (v2f i) : SV_Target0
+			float4 frag (v2f i) : SV_Target
 			{
 				float4 albedo = UNITY_READ_FRAMEBUFFER_INPUT(0, i.vertex.xyz);
 				float4 emission = UNITY_READ_FRAMEBUFFER_INPUT(1, i.vertex.xyz);

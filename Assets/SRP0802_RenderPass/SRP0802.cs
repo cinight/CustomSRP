@@ -31,14 +31,14 @@ public class SRP0802Instance : RenderPipeline
     private static RenderTargetIdentifier m_ColorRT = new RenderTargetIdentifier(m_ColorRTid);
     private int depthBufferBits = 24;
 
-    private static Material copyColorMaterial;
+    //private static Material copyColorMaterial;
 
     public SRP0802Instance()
     {
-        copyColorMaterial = new Material(Shader.Find("Hidden/CustomSRP/SRP0802/CopyColor"))
-        {
-            hideFlags = HideFlags.HideAndDontSave
-        };
+        // copyColorMaterial = new Material(Shader.Find("Hidden/CustomSRP/SRP0802/CopyColor"))
+        // {
+        //     hideFlags = HideFlags.HideAndDontSave
+        // };
     }
 
     protected override void Render(ScriptableRenderContext context, Camera[] cameras)
@@ -75,7 +75,8 @@ public class SRP0802Instance : RenderPipeline
             CommandBuffer cmdTempId = new CommandBuffer();
             cmdTempId.name = "("+camera.name+")"+ "Setup TempRT";
             cmdTempId.GetTemporaryRT(m_ColorRTid, colorRTDesc,FilterMode.Bilinear);
-            cmdTempId.ClearRenderTarget(clearDepth, clearColor, camera.backgroundColor);
+            cmdTempId.SetRenderTarget(m_ColorRT);
+            //cmdTempId.ClearRenderTarget(clearDepth, clearColor, camera.backgroundColor);
             context.ExecuteCommandBuffer(cmdTempId);
             cmdTempId.Release();
 
@@ -88,35 +89,36 @@ public class SRP0802Instance : RenderPipeline
             AttachmentDescriptor m_Albedo = new AttachmentDescriptor(m_ColorFormat);
             AttachmentDescriptor m_Emission = new AttachmentDescriptor(m_ColorFormat);
             AttachmentDescriptor m_Combine = new AttachmentDescriptor(m_ColorFormat);
-            AttachmentDescriptor m_Output = new AttachmentDescriptor(m_ColorFormat);
+            m_Combine.ConfigureTarget(m_ColorRT, false, true);
+            //AttachmentDescriptor m_Output = new AttachmentDescriptor(m_ColorFormat);
             AttachmentDescriptor m_Depth = new AttachmentDescriptor(RenderTextureFormat.Depth);
+            
 
             //Native Arrays for Attachaments
-            NativeArray<AttachmentDescriptor> renderPassAttachments = new NativeArray<AttachmentDescriptor>(5, Allocator.Temp);
+            NativeArray<AttachmentDescriptor> renderPassAttachments = new NativeArray<AttachmentDescriptor>(4, Allocator.Temp);
             renderPassAttachments[0] = m_Albedo;
             renderPassAttachments[1] = m_Emission;
             renderPassAttachments[2] = m_Combine;
-            renderPassAttachments[3] = m_Output;
-            renderPassAttachments[4] = m_Depth;
+            //renderPassAttachments[3] = m_Output;
+            renderPassAttachments[3] = m_Depth;
             NativeArray<int> renderPassColorAttachments = new NativeArray<int>(2, Allocator.Temp);
             renderPassColorAttachments[0] = 0;
             renderPassColorAttachments[1] = 1;
             NativeArray<int> renderPassCombineAttachments = new NativeArray<int>(1, Allocator.Temp);
             renderPassCombineAttachments[0] = 2;
-            NativeArray<int> renderPassOutputAttachments = new NativeArray<int>(1, Allocator.Temp);
-            renderPassOutputAttachments[0] = 3;
+            //NativeArray<int> renderPassOutputAttachments = new NativeArray<int>(1, Allocator.Temp);
+            //renderPassOutputAttachments[0] = 3;
 
             // Camera clear flag
             m_Albedo.ConfigureClear(camera.backgroundColor,1,0);
-            m_Emission.ConfigureClear(Color.black,1,0);
-            m_Depth.ConfigureClear(Color.black,1,0);
-            m_Combine.ConfigureClear(Color.black,1,0);
-            m_Output.ConfigureClear(Color.black,1,0);
-            m_Output.ConfigureTarget(m_ColorRT, false, true);
-
+            m_Emission.ConfigureClear(new Color(0.0f, 0.0f, 0.0f, 0.0f),1,0);
+            m_Depth.ConfigureClear(new Color(),1,0);
+            m_Combine.ConfigureClear(new Color(0.0f, 0.0f, 0.0f, 0.0f),1,0);
+            //m_Output.ConfigureClear(Color.black,1,0);
+            
             //If we want to use the old way, we can use ScopedRenderPass
             //using (context.BeginScopedRenderPass(...)) { ... }
-            using ( context.BeginScopedRenderPass(camera.pixelWidth, camera.pixelHeight,1,renderPassAttachments, 4) )
+            using ( context.BeginScopedRenderPass(camera.pixelWidth, camera.pixelHeight,1,renderPassAttachments, 3) )
             {
                 using ( context.BeginScopedSubPass(renderPassColorAttachments,false) )
                 {
@@ -149,16 +151,18 @@ public class SRP0802Instance : RenderPipeline
                     filterSettings.renderQueueRange = RenderQueueRange.transparent;
                     context.DrawRenderers(cull, ref drawSettings2, ref filterSettings);
                 }
-                using ( context.BeginScopedSubPass(renderPassOutputAttachments,renderPassCombineAttachments) )
-                {
-                    //Blit back to CameraTarget
-                    CommandBuffer cmd = new CommandBuffer();
-                    cmd.name = "Cam:"+camera.name+" BlitToColorTexture";
-                    cmd.Blit(m_ColorRT,BuiltinRenderTextureType.CameraTarget,copyColorMaterial);
-                    context.ExecuteCommandBuffer(cmd);
-                    cmd.Release(); 
-                }
+                // using ( context.BeginScopedSubPass(renderPassOutputAttachments,renderPassCombineAttachments) )
+                // {
+                //     //Blit back to CameraTarget
+
+                // }
             }
+
+            CommandBuffer cmd = new CommandBuffer();
+            cmd.name = "Cam:"+camera.name+" BlitToColorTexture";
+            cmd.Blit(m_ColorRT,BuiltinRenderTextureType.CameraTarget);
+            context.ExecuteCommandBuffer(cmd);
+            cmd.Release(); 
 
             //CleanUp
             CommandBuffer cmdclean = new CommandBuffer();
@@ -173,7 +177,8 @@ public class SRP0802Instance : RenderPipeline
             //CleanUp
             renderPassAttachments.Dispose();
             renderPassColorAttachments.Dispose();
-            renderPassOutputAttachments.Dispose();
+            renderPassCombineAttachments.Dispose();
+            //renderPassOutputAttachments.Dispose();
 
             
         }
