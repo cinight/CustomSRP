@@ -4,7 +4,7 @@ A new SRP from scratch
 Unity version : 2019.1.0b4
 
 Tested with : 
-Win DX11 Gamma
+Win DX11 Gamma / Linear
 
 | Scene | Image | Description |
 | --- | - | --- |
@@ -23,9 +23,12 @@ Win DX11 Gamma
 | `SRP0701_HDR_MSAA` | ![](READMEImages/SRP0701_HDR_MSAA.gif) | Use HDR and MSAA |
 | `SRP0702_Postprocessing` | ![](READMEImages/SRP0702_Postprocessing.gif) | This shows you how to use Postprocessing Stack with SRP (transparent effects e.g. Bloom, Depth of Field) |
 | `SRP0801_UGUI` | ![](READMEImages/SRP0801_UGUI.JPG) | Use UICamera to render UGUI, also render 3D objects and particle on UI |
+| `SRP0802_RenderPass` | ![](READMEImages/SRP0802_RenderPass.gif) | Use RenderPass to target multiple color attachments and read / write from / to them |
+| `SRP0803_MultiRenderTarget` | ![](READMEImages/SRP0803_MultiRenderTarget.JPG) | Use CommandBuffer.SetRenderTarget() to target multiple color surfaces |
 | `SRP0901_SceneViewFix` | ![](READMEImages/SRP0901_SceneViewFix.JPG) | Make the gizmos / icons appear on scene view |
+| `SRP0902_SceneViewDrawMode` | ![](READMEImages/SRP0902_SceneViewDrawMode.gif) | Adding custom Scene View draw modes |
 | `SRP1001_Error` | ![](READMEImages/SRP1001_Error.JPG) | Render the pink shaders on the materials that the SRP doesn't support |
-| `xxxx` | ![](READMEImages/xxxx.gif) | xxxxxx |
+| `SRP1002_Debug` | ![](READMEImages/SRP1002_Debug.JPG) | Make the Profiler records the timing for SRP performance debugging |
 | `xxxx` | ![](READMEImages/xxxx.gif) | xxxxxx |
 | `xxxx` | ![](READMEImages/xxxx.gif) | xxxxxx |
 | `xxxx` | ![](READMEImages/xxxx.gif) | xxxxxx |
