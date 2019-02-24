@@ -12,11 +12,11 @@
         // #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Builtin/BuiltinData.hlsl"
 
         Texture2D _CameraDepthTexture;
-        float4 _ScreenSize;
-        float4x4 _InvViewProjMatrix;
-        float4x4 _ViewMatrix;
-        float4x4 _NonJitteredViewProjMatrix;
-        float4x4 _PrevViewProjMatrix;
+        float4 _ScreenSize; //BuiltIn
+        float4x4 _InvViewProjMatrix; //BuiltIn
+        float4x4 _ViewMatrix; //BuiltIn
+        float4x4 _NonJitteredViewProjMatrix; //BuiltIn
+        float4x4 _PrevViewProjMatrix; //BuiltIn
 
         struct Attributes
         {
