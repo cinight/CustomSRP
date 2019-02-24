@@ -15,6 +15,7 @@ Win DX11 Gamma / Linear
 | `SRP0201_FrustumCulling` | ![](READMEImages/SRP0201_FrustumCulling.gif) | Frustum culling always work. This is a test scene to verify the culling results |
 | `SRP0202_OcclusionCulling` | ![](READMEImages/SRP0202_OcclusionCulling.gif) | Baked Occlusion Culling |
 | `SRP0301_Batching` | ![](READMEImages/SRP0301_Batching.JPG) | Use Static Batching, Dynamic Batching, GPU Instancing and SRP Batcher |
+| `xxxx` | ![](READMEImages/xxxx.gif) | xxxxxx |
 | `SRP0401_NoSpecificPass` | ![](READMEImages/SRP0401_NoSpecificPass.JPG) | To draw the shaders that do not have a tag, e.g. default Unlit shaders |
 | `SRP0402_Multipass` | ![](READMEImages/SRP0402_Multipass.JPG) | In SRP we need to specify the pass names, so no more infinite pass. But we can specify the orders of passes |
 | `SRP0403_Compute` | ![](READMEImages/SRP0403_Compute.JPG) | Use compute shader to achieve simple edge detection |
@@ -39,6 +40,9 @@ Win DX11 Gamma / Linear
 | `xxxx` | ![](READMEImages/xxxx.gif) | xxxxxx |
 | `xxxx` | ![](READMEImages/xxxx.gif) | xxxxxx |
 
-
-
-
+-------------
+References:
+My first custom SRP study for Unity2018.3 : https://cmwdexint.com/2018/05/24/custom-srp/
+SRPFromScratch by pbbastian : https://github.com/pbbastian/SRPFromScratch
+Siggraph 2018 SRP presentation by Matt Dean
+Custom Pipeline by Catlike Coding : https://catlikecoding.com/unity/tutorials/scriptable-render-pipeline/custom-pipeline/
