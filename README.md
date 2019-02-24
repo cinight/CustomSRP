@@ -40,9 +40,11 @@ Win DX11 Gamma / Linear
 | `xxxx` | ![](READMEImages/xxxx.gif) | xxxxxx |
 | `xxxx` | ![](READMEImages/xxxx.gif) | xxxxxx |
 
+
+
 -------------
-References:
-My first custom SRP study for Unity2018.3 : https://cmwdexint.com/2018/05/24/custom-srp/
-SRPFromScratch by pbbastian : https://github.com/pbbastian/SRPFromScratch
-Siggraph 2018 SRP presentation by Matt Dean
-Custom Pipeline by Catlike Coding : https://catlikecoding.com/unity/tutorials/scriptable-render-pipeline/custom-pipeline/
+References: \
+[My first custom SRP study for Unity2018.3](https://cmwdexint.com/2018/05/24/custom-srp/) \
+[SRPFromScratch by pbbastian](https://github.com/pbbastian/SRPFromScratch) \
+Siggraph 2018 SRP presentation by Matt Dean \
+[Custom Pipeline by Catlike Coding](https://catlikecoding.com/unity/tutorials/scriptable-render-pipeline/custom-pipeline/)
