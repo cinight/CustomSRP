@@ -113,6 +113,8 @@ public class SRP0703Instance : RenderPipeline
 
             //************************** Setup DrawSettings and FilterSettings ************************************
 
+            camera.depthTextureMode |= DepthTextureMode.MotionVectors | DepthTextureMode.Depth;
+
             var sortingSettings = new SortingSettings(camera);
             DrawingSettings drawSettings = new DrawingSettings(m_PassName, sortingSettings);
             FilteringSettings filterSettings = new FilteringSettings(RenderQueueRange.all);
