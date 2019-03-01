@@ -89,11 +89,13 @@ public class SRP0502Instance : RenderPipeline
 
             //Opaque objects
             sortingSettings.criteria = SortingCriteria.CommonOpaque;
+            drawSettings.sortingSettings = sortingSettings;
             filterSettings.renderQueueRange = RenderQueueRange.opaque;
             context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
 
             //Transparent objects
             sortingSettings.criteria = SortingCriteria.CommonTransparent;
+            drawSettings.sortingSettings = sortingSettings;
             filterSettings.renderQueueRange = RenderQueueRange.transparent;
             context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
 
@@ -108,6 +110,7 @@ public class SRP0502Instance : RenderPipeline
 
             //Distortion object
             sortingSettings.criteria = SortingCriteria.CommonOpaque;
+            drawSettings.sortingSettings = sortingSettings;
             filterSettings.renderQueueRange = RenderQueueRange.opaque;
             context.DrawRenderers(cull, ref drawSettingsDistortion, ref filterSettings);
 

@@ -1,4 +1,4 @@
-﻿Shader "FTPCustom/Feature/Stencil Unlit"
+﻿Shader "CustomSRP/SRP0704/UnlitOpaque Stencil"
 {
     Properties
     {
@@ -18,7 +18,7 @@
 
         Pass
         {
-            Tags { "LightMode" = "SRP0704_Pass" }
+            Tags { "LightMode" = "SRP0701_Pass" }
             
             Stencil
             {

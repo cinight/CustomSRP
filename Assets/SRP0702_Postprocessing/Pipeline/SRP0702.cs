@@ -110,6 +110,7 @@ public class SRP0702Instance : RenderPipeline
 
             //Opaque objects
             sortingSettings.criteria = SortingCriteria.CommonOpaque;
+            drawSettingsDepth.sortingSettings = sortingSettings;
             filterSettings.renderQueueRange = RenderQueueRange.opaque;
             context.DrawRenderers(cull, ref drawSettingsDepth, ref filterSettings);
 
@@ -136,6 +137,7 @@ public class SRP0702Instance : RenderPipeline
             //************************** Rendering Opaque Objects ************************************
 
             sortingSettings.criteria = SortingCriteria.CommonOpaque;
+            drawSettings.sortingSettings = sortingSettings;
             filterSettings.renderQueueRange = RenderQueueRange.opaque;
             context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
 
@@ -177,6 +179,7 @@ public class SRP0702Instance : RenderPipeline
             //************************** Rendering Transparent Objects ************************************
 
             sortingSettings.criteria = SortingCriteria.CommonTransparent;
+            drawSettings.sortingSettings = sortingSettings;
             filterSettings.renderQueueRange = RenderQueueRange.transparent;
             context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
 

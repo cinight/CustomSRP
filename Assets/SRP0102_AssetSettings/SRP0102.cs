@@ -54,6 +54,7 @@ namespace SRP0102
                 if(m_PipelineAsset.drawOpaqueObjects) //Use the settings on the asset
                 {
                     sortingSettings.criteria = SortingCriteria.CommonOpaque;
+                    drawSettings.sortingSettings = sortingSettings;
                     filterSettings.renderQueueRange = RenderQueueRange.opaque;
                     context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
                 }
@@ -62,6 +63,7 @@ namespace SRP0102
                 if(m_PipelineAsset.drawTransparentObjects) //Use the settings on the asset
                 {
                     sortingSettings.criteria = SortingCriteria.CommonTransparent;
+                    drawSettings.sortingSettings = sortingSettings;
                     filterSettings.renderQueueRange = RenderQueueRange.transparent;
                     context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
                 }

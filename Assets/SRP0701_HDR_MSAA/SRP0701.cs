@@ -28,7 +28,7 @@ public class SRP0701Instance : RenderPipeline
     private static RenderTargetIdentifier m_ColorRT = new RenderTargetIdentifier(m_ColorRTid);
     private static UnityEngine.Experimental.Rendering.GraphicsFormat m_ColorFormatHDR = SystemInfo.GetGraphicsFormat(UnityEngine.Experimental.Rendering.DefaultFormat.HDR);
     private static UnityEngine.Experimental.Rendering.GraphicsFormat m_ColorFormat = SystemInfo.GetGraphicsFormat(UnityEngine.Experimental.Rendering.DefaultFormat.LDR);
-    private int depthBufferBits = 24;
+    private int depthBufferBits = 24; //16 won't have stencil
 
     public SRP0701Instance()
     {
@@ -92,11 +92,13 @@ public class SRP0701Instance : RenderPipeline
 
             //Opaque objects
             sortingSettings.criteria = SortingCriteria.CommonOpaque;
+            drawSettings.sortingSettings = sortingSettings;
             filterSettings.renderQueueRange = RenderQueueRange.opaque;
             context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
 
             //Transparent objects
             sortingSettings.criteria = SortingCriteria.CommonTransparent;
+            drawSettings.sortingSettings = sortingSettings;
             filterSettings.renderQueueRange = RenderQueueRange.transparent;
             context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
 

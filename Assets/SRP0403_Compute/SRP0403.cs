@@ -92,11 +92,13 @@ namespace SRP0403
 
                 //Draw Depth with Opaque objects
                 sortingSettings.criteria = SortingCriteria.CommonOpaque;
+                drawSettingsDepth.sortingSettings = sortingSettings;
                 filterSettings.renderQueueRange = RenderQueueRange.opaque;
                 context.DrawRenderers(cull, ref drawSettingsDepth, ref filterSettings);
 
                 //Draw Depth with Transparent objects
                 sortingSettings.criteria = SortingCriteria.CommonTransparent;
+                drawSettingsDepth.sortingSettings = sortingSettings;
                 filterSettings.renderQueueRange = RenderQueueRange.transparent;
                 context.DrawRenderers(cull, ref drawSettingsDepth, ref filterSettings);
 
@@ -119,11 +121,13 @@ namespace SRP0403
 
                 //Opaque objects
                 sortingSettings.criteria = SortingCriteria.CommonOpaque;
+                drawSettings.sortingSettings = sortingSettings;
                 filterSettings.renderQueueRange = RenderQueueRange.opaque;
                 context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
 
                 //Transparent objects
                 sortingSettings.criteria = SortingCriteria.CommonTransparent;
+                drawSettings.sortingSettings = sortingSettings;
                 filterSettings.renderQueueRange = RenderQueueRange.transparent;
                 context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
 
