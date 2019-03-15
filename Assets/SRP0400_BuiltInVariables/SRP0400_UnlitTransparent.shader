@@ -18,7 +18,7 @@
 			HLSLPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-			#include "ShaderLibrary/Scratch/Scratch.hlsl"
+			#include "../_General/ShaderLibrary/Scratch/Scratch.hlsl"
 
 			struct appdata
 			{
