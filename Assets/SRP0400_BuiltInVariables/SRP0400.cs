@@ -25,8 +25,14 @@ public class SRP0400Instance : RenderPipeline
 {
     private static readonly ShaderTagId m_PassName = new ShaderTagId("SRP0400_Pass"); //The shader pass tag just for SRP0400
 
-    static int lightColorID = Shader.PropertyToID("_LightColor");
-    static int lightDataID = Shader.PropertyToID("_LightData");
+    //Realtime Lights
+    static int lightColorID = Shader.PropertyToID("_LightColorArray");
+    static int lightDataID = Shader.PropertyToID("_LightDataArray");
+    static int lightSpotDirID = Shader.PropertyToID("_LightSpotDirArray");
+    private const int lightCount = 8;      
+    Vector4[] lightColor = new Vector4[lightCount];
+    Vector4[] lightData = new Vector4[lightCount];
+    Vector4[] lightSpotDir = new Vector4[lightCount];
 
     public SRP0400Instance()
     {
@@ -87,72 +93,64 @@ public class SRP0400Instance : RenderPipeline
         }
     }
 
-    private static int lightCount = 8;      
-    Vector4[] lightColor = new Vector4[lightCount];
-    Vector4[] lightData = new Vector4[lightCount];
-
     private void SetUpRealtimeLightingVariables(ScriptableRenderContext context, CullingResults cull)
     {
-        int lightCount = 8;//Mathf.Min(cull.visibleLights.Length,8); //Max 8 lights
-        int actualLightCount = cull.visibleLights.Length;
-        //if(lightCount == 0) return;
+        for (var i = 0; i < lightCount; i++)
+        {
+            lightColor[i] = Vector4.zero;
+            lightData[i] = Vector4.zero;
+            lightSpotDir[i] = Vector4.zero;
 
-        // for (var i = 0; i < lightCount; i++)
-        // {
-        //     lightColor[i] = Vector4.zero;
-        //     lightData[i] = Vector4.zero;
-        // }
-
-
-        // for (var i = 0; i < lightCount; i++)
-        // {
-        //     lightColor[i] = Vector4.zero;
-        //     lightData[i] = Vector4.zero;
-
-        //     if( i >= actualLightCount) continue;
-
-
-
-        //     VisibleLight light = cull.visibleLights[i];
-        //     Vector4 data = Vector4.zero;
+            if( i >= cull.visibleLights.Length ) continue;
+            VisibleLight light = cull.visibleLights[i];
             
-        //     if (light.lightType == LightType.Directional)
-        //     {
-        //         // If it's a directional light we store direction in the xyz components, and a negative
-        //         // value in the w component. This allows us to identify whether it is a directional light.
-        //         data = light.localToWorldMatrix.MultiplyVector(Vector3.back);
-        //         data.w = -1;
-        //     }
-        //     else if (light.lightType == LightType.Point)
-        //     {
-        //         // If it's a point light we store position in the xyz components, 
-        //         // and range in the w component.
-        //         data = light.localToWorldMatrix.GetColumn(3);
-        //         data.w = light.range;
-        //     }
-        //     else if (light.lightType == LightType.Spot)
-        //     {
-        //         // If it's a spot light we store direction in the xyz components
-        //         data = light.localToWorldMatrix.GetColumn(2);
-        //         data.x = -data.x;
-        //         data.y = -data.y;
-        //         data.z = -data.z;
-        //         data.w = 0;
-        //     }
-        //     else
-        //     {
-        //         // If it's not a point / directional / spot light, we ignore the light.
-        //         continue;
-        //     }
+            if (light.lightType == LightType.Directional)
+            {
+                lightData[i] = light.localToWorldMatrix.MultiplyVector(Vector3.back);
+                lightColor[i] = light.finalColor;
+                lightColor[i].w = -1; //for identifying it is a directional light in shader
+                
+            }
+            else if (light.lightType == LightType.Point)
+            {
+                lightData[i] = light.localToWorldMatrix.GetColumn(3);
+                lightData[i].w = light.range;
+                lightColor[i] = light.finalColor;
+                lightColor[i].w = -2; //for identifying it is a point light in shader
+            }
+            else if (light.lightType == LightType.Spot)
+            {
+                lightData[i] = light.localToWorldMatrix.GetColumn(3);
+                lightData[i].w = 1f /Mathf.Max(light.range * light.range, 0.00001f);
 
-        //     lightColor[i] = light.finalColor;
-        //     lightData[i] = data;
-        // }
+                lightSpotDir[i] = light.localToWorldMatrix.GetColumn(2);
+                lightSpotDir[i].x = -lightSpotDir[i].x;
+                lightSpotDir[i].y = -lightSpotDir[i].y;
+                lightSpotDir[i].z = -lightSpotDir[i].z;
+                lightColor[i] = light.finalColor;
+
+                float outerRad = Mathf.Deg2Rad * 0.5f * light.spotAngle;
+				float outerCos = Mathf.Cos(outerRad);
+                float outerTan  = Mathf.Tan(outerRad);
+				float innerCos = Mathf.Cos(Mathf.Atan(((46f / 64f) * outerTan)));
+                float angleRange = Mathf.Max(innerCos - outerCos, 0.001f);
+
+                //Spotlight attenuation
+                lightSpotDir[i].w = 1f / angleRange;
+				lightColor[i].w = -outerCos * lightSpotDir[i].w;
+            }
+            else
+            {
+                // If it's not a point / directional / spot light, we ignore the light.
+                continue;
+            }
+        }
         
-        // CommandBuffer cmdLight = CommandBufferPool.Get("Set-up Light Buffer");
-        // cmdLight.SetGlobalVectorArray(lightColorID, lightColor);
-        // cmdLight.SetGlobalVectorArray(lightDataID, lightData);
-        // context.ExecuteCommandBuffer(cmdLight);
-        // CommandBufferPool.Release(cmdLight);
+        CommandBuffer cmdLight = CommandBufferPool.Get("Set-up Light Buffer");
+        cmdLight.SetGlobalVectorArray(lightDataID, lightData);
+        cmdLight.SetGlobalVectorArray(lightColorID, lightColor);
+        cmdLight.SetGlobalVectorArray(lightSpotDirID, lightSpotDir);
+        context.ExecuteCommandBuffer(cmdLight);
+        CommandBufferPool.Release(cmdLight);
     }
 }

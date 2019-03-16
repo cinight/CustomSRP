@@ -44,8 +44,9 @@
 			#define MAXLIGHTCOUNT 8
 
 			CBUFFER_START(_LightBuffer)
-				float4 _LightColor[MAXLIGHTCOUNT];
-				float4 _LightData[MAXLIGHTCOUNT];
+				float4 _LightColorArray[MAXLIGHTCOUNT];
+				float4 _LightDataArray[MAXLIGHTCOUNT];
+				float4 _LightSpotDirArray[MAXLIGHTCOUNT];
 			CBUFFER_END
 			
 			v2f vert (appdata v)
@@ -64,26 +65,23 @@
 			float4 frag (v2f IN) : SV_Target
 			{
 				float4 albedo = tex2D(_MainTex, IN.uv) * _Color;
-				float3 lighting = 0;
 
 				for (int i = 0; i < MAXLIGHTCOUNT; i++) 
 				{
-					if (_LightData[i].w == -1) //-1 is directional
+					if (_LightColorArray[i].w == -1) //-1 is directional
 					{
-						lighting += ShadeDirectionalLight(IN.normalWS, albedo, _LightData[i].xyz, _LightColor[i]);
+						albedo.rgb += ShadeDirectionalLight(IN.normalWS, albedo, _LightDataArray[i].xyz, _LightColorArray[i]);
 					}
-					else if (_LightData[i].w == 0) //0 is spotlight
+					else if (_LightColorArray[i].w == -2) //-2 is pointlight
 					{
-						//TODO
-						//color += ShadeDirectionalLight(i.normalWS, albedo, _LightData[i].xyz, _LightColor[i]);
+						albedo.rgb += ShadePointLight(IN.normalWS, albedo, IN.positionWS, _LightDataArray[i].xyz, _LightDataArray[i].w, _LightColorArray[i]);
 					}
-					else 
+					else //Spotlight
 					{
-						lighting += ShadePointLight(IN.normalWS, albedo, IN.positionWS, _LightData[i].xyz, _LightData[i].w, _LightColor[i]);
+						albedo.rgb += ShadeSpotLight(IN.normalWS, albedo, IN.positionWS, _LightDataArray[i], _LightSpotDirArray[i], _LightColorArray[i]);
 					}
 				}
 				
-				albedo.rgb += lighting;
 				return albedo;
 			}
 			ENDHLSL
