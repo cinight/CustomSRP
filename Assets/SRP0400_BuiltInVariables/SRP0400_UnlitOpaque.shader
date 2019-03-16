@@ -70,15 +70,15 @@
 				{
 					if (_LightColorArray[i].w == -1) //-1 is directional
 					{
-						albedo.rgb += ShadeDirectionalLight(IN.normalWS, albedo, _LightDataArray[i].xyz, _LightColorArray[i]);
+						albedo.rgb += ShadeDirectionalLight(IN.normalWS, albedo.rgb, _LightDataArray[i].xyz, _LightColorArray[i].rgb);
 					}
 					else if (_LightColorArray[i].w == -2) //-2 is pointlight
 					{
-						albedo.rgb += ShadePointLight(IN.normalWS, albedo, IN.positionWS, _LightDataArray[i].xyz, _LightDataArray[i].w, _LightColorArray[i]);
+						albedo.rgb += ShadePointLight(IN.normalWS, albedo.rgb, IN.positionWS, _LightDataArray[i].xyz, _LightDataArray[i].w, _LightColorArray[i].rgb);
 					}
 					else //Spotlight
 					{
-						albedo.rgb += ShadeSpotLight(IN.normalWS, albedo, IN.positionWS, _LightDataArray[i], _LightSpotDirArray[i], _LightColorArray[i]);
+						albedo.rgb += ShadeSpotLight(IN.normalWS, albedo.rgb, IN.positionWS, _LightDataArray[i], _LightSpotDirArray[i], _LightColorArray[i]);
 					}
 				}
 				
