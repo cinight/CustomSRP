@@ -10,13 +10,12 @@
 		Pass
 		{
 			Tags { "LightMode" = "SRP0501_Pass" }
-
 			ZWrite On
 
-			CGPROGRAM
+			HLSLPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-			#include "UnityCG.cginc"
+			#include "../_General/ShaderLibrary/Input/Transformation.hlsl"
 
 			struct appdata
 			{
@@ -31,7 +30,7 @@
 			v2f vert (appdata v)
 			{
 				v2f o;
-				o.vertex = UnityObjectToClipPos(v.vertex);
+				o.vertex = TransformObjectToHClip(v.vertex.xyz);
 				return o;
 			}
 			
@@ -39,7 +38,7 @@
 			{
 				return 1;
 			}
-			ENDCG
+			ENDHLSL
 		}
 	}
 }

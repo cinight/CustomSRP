@@ -10,11 +10,10 @@
 		{
 			Tags { "LightMode" = "SRP0803_Pass" }
 
-			CGPROGRAM
+			HLSLPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-
-			#include "UnityCG.cginc"
+			#include "../_General/ShaderLibrary/Input/Transformation.hlsl"
 
 			struct appdata
 			{
@@ -34,13 +33,15 @@
 				float4 Emission : SV_Target1;
 			};
 
+			CBUFFER_START(UnityPerMaterial)
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
+			CBUFFER_END
 			
 			v2f vert (appdata v)
 			{
 				v2f o;
-				o.vertex = UnityObjectToClipPos(v.vertex);
+				o.vertex = TransformObjectToHClip(v.vertex.xyz);
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 				return o;
 			}
@@ -56,7 +57,7 @@
 				
 				return o;
 			}
-			ENDCG
+			ENDHLSL
 		}
 	}
 }

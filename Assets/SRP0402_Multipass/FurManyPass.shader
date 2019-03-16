@@ -14,102 +14,102 @@ Shader "CustomSRP/SRP0402/Fur"
 		Pass
 		{
 			Tags { "LightMode" = "SRP0402_Pass0" }
-			CGPROGRAM
+			HLSLPROGRAM
 			#define FURLAYER 0.0
 			#pragma vertex vert
 			#pragma fragment frag
-			#include "FurManyPass.cginc"
-			ENDCG
+			#include "FurManyPass.hlsl"
+			ENDHLSL
 		}
 		Pass
 		{
 			Tags { "LightMode" = "SRP0402_Pass1" }
-			CGPROGRAM
+			HLSLPROGRAM
 			#define FURLAYER 0.01
 			#pragma vertex vert
 			#pragma fragment frag
-			#include "FurManyPass.cginc"
-			ENDCG
+			#include "FurManyPass.hlsl"
+			ENDHLSL
 		}
 		Pass
 		{
 			Tags { "LightMode" = "SRP0402_Pass2" }
-			CGPROGRAM
+			HLSLPROGRAM
 			#define FURLAYER 0.02
 			#pragma vertex vert
 			#pragma fragment frag
-			#include "FurManyPass.cginc"
-			ENDCG
+			#include "FurManyPass.hlsl"
+			ENDHLSL
 		}
 		Pass
 		{
 			Tags { "LightMode" = "SRP0402_Pass3" }
-			CGPROGRAM
+			HLSLPROGRAM
 			#define FURLAYER 0.03
 			#pragma vertex vert
 			#pragma fragment frag
-			#include "FurManyPass.cginc"
-			ENDCG
+			#include "FurManyPass.hlsl"
+			ENDHLSL
 		}
 		Pass
 		{
 			Tags { "LightMode" = "SRP0402_Pass4" }
-			CGPROGRAM
+			HLSLPROGRAM
 			#define FURLAYER 0.04
 			#pragma vertex vert
 			#pragma fragment frag
-			#include "FurManyPass.cginc"
-			ENDCG
+			#include "FurManyPass.hlsl"
+			ENDHLSL
 		}
 		Pass
 		{
 			Tags { "LightMode" = "SRP0402_Pass5" }
-			CGPROGRAM
+			HLSLPROGRAM
 			#define FURLAYER 0.05
 			#pragma vertex vert
 			#pragma fragment frag
-			#include "FurManyPass.cginc"
-			ENDCG
+			#include "FurManyPass.hlsl"
+			ENDHLSL
 		}
 		Pass
 		{
 			Tags { "LightMode" = "SRP0402_Pass6" }
-			CGPROGRAM
+			HLSLPROGRAM
 			#define FURLAYER 0.06
 			#pragma vertex vert
 			#pragma fragment frag
-			#include "FurManyPass.cginc"
-			ENDCG
+			#include "FurManyPass.hlsl"
+			ENDHLSL
 		}
 		Pass
 		{
 			Tags { "LightMode" = "SRP0402_Pass7" }
-			CGPROGRAM
+			HLSLPROGRAM
 			#define FURLAYER 0.07
 			#pragma vertex vert
 			#pragma fragment frag
-			#include "FurManyPass.cginc"
-			ENDCG
+			#include "FurManyPass.hlsl"
+			ENDHLSL
 		}
 		Pass
 		{
 			Tags { "LightMode" = "SRP0402_Pass8" }
-			CGPROGRAM
+			HLSLPROGRAM
 			#define FURLAYER 0.08
 			#pragma vertex vert
 			#pragma fragment frag
-			#include "FurManyPass.cginc"
-			ENDCG
+			#include "FurManyPass.hlsl"
+			ENDHLSL
 		}
 		Pass
 		{
 			Tags { "LightMode" = "SRP0402_Pass9" }
-			CGPROGRAM
+			HLSLPROGRAM
 			#define FURLAYER 0.09
 			#pragma vertex vert
 			#pragma fragment frag
-			#include "FurManyPass.cginc"
-			ENDCG
+			#include "FurManyPass.hlsl"
+			ENDHLSL
 		}
 	}
 }

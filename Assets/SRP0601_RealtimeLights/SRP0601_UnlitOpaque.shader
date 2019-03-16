@@ -18,7 +18,6 @@
 			#pragma fragment frag
 			#include "SRP0601_RealtimeLights.hlsl"
 			#include "../_General/ShaderLibrary/Input/Transformation.hlsl"
-			#include "../_General/ShaderLibrary/Input/UnityBuiltIn.hlsl"
 
 			struct appdata
 			{

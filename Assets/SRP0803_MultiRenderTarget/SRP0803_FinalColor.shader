@@ -13,12 +13,10 @@
             // No culling or depth
             Cull Off ZWrite Off ZTest Always
 	
-			CGPROGRAM
+			HLSLPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-
-			#include "UnityCG.cginc"
-			#include "HLSLSupport.cginc"
+			#include "../_General/ShaderLibrary/Input/Transformation.hlsl"
 
 			struct appdata
 			{
@@ -35,13 +33,15 @@
 			v2f vert (appdata v)
 			{
 				v2f o;
-				o.vertex = UnityObjectToClipPos(v.vertex);
+				o.vertex = TransformObjectToHClip(v.vertex.xyz);
 				o.uv = v.uv;
 				return o;
 			}
-			
+
+			CBUFFER_START(UnityPerMaterial)
 			sampler2D _CameraAlbedoTexture;
 			sampler2D _CameraEmissionTexture;
+			CBUFFER_END
 
 			float4 frag (v2f i) : SV_Target
 			{
@@ -50,7 +50,7 @@
 
 				return albedo + emission;
 			}
-			ENDCG
+			ENDHLSL
         }
     }
 }

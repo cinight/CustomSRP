@@ -33,6 +33,7 @@
 			#pragma vertex vert
 			#pragma fragment frag
 
+			#include "../_General/ShaderLibrary/Input/Transformation.hlsl"
 			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
 			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/UnityInstancing.hlsl"
 			
@@ -50,16 +51,16 @@
 
 			sampler2D _MainTex;
 
-			CBUFFER_START(UnityPerDraw)
-			float4x4 unity_ObjectToWorld;
-			float4x4 unity_WorldToObject;
-			float4 unity_LODFade;
-			float4 unity_WorldTransformParams;
-			CBUFFER_END
+			// CBUFFER_START(UnityPerDraw)
+			// float4x4 unity_ObjectToWorld;
+			// float4x4 unity_WorldToObject;
+			// float4 unity_LODFade;
+			// float4 unity_WorldTransformParams;
+			// CBUFFER_END
 
-			CBUFFER_START(UnityPerFrame)
-			float4x4 unity_MatrixVP;
-			CBUFFER_END
+			// CBUFFER_START(UnityPerFrame)
+			// float4x4 unity_MatrixVP;
+			// CBUFFER_END
 
 			UNITY_INSTANCING_CBUFFER_SCOPE_BEGIN(UnityPerMaterial) //SRPBatcher	(respect block)
 			float4 _MainTex_ST;
@@ -84,7 +85,7 @@
 			v2f vert (appdata v)
 			{
 				v2f o;
-				o.vertex = mul(unity_MatrixVP, mul(unity_ObjectToWorld, float4(v.vertex.xyz, 1.0)));
+				o.vertex = TransformObjectToHClip(v.vertex.xyz);//mul(unity_MatrixVP, mul(unity_ObjectToWorld, float4(v.vertex.xyz, 1.0)));
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 				return o;
 			}

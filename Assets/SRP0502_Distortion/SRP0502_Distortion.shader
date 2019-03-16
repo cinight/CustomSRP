@@ -18,11 +18,10 @@
 		{
 			Tags { "LightMode" = "SRP0502_Distortion" }
 
-			CGPROGRAM
+			HLSLPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-
-			#include "UnityCG.cginc"
+			#include "../_General/ShaderLibrary/Input/Transformation.hlsl"
 
 			struct appdata
 			{
@@ -37,25 +36,27 @@
 				float4 grabPos : TEXCOORD1;
 			};
 
+			CBUFFER_START(UnityPerMaterial)
 			sampler2D _CameraColorTexture;
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
 			float _Noise;
 			float4 _Color;
+			CBUFFER_END
 			
 			v2f vert (appdata v)
 			{
 				v2f o;
-				o.vertex = UnityObjectToClipPos(v.vertex);
+				o.vertex = TransformObjectToHClip(v.vertex.xyz);
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 				o.grabPos = ComputeGrabScreenPos(o.vertex);
 
 				return o;
 			}
 
-			fixed4 frag (v2f i) : SV_Target
+			float4 frag (v2f i) : SV_Target
 			{
-				fixed4 bguv = i.grabPos;
+				float4 bguv = i.grabPos;
 				float2 nuv = bguv.xy / bguv.w;
 				
 				// #ifdef UNITY_UV_STARTS_AT_TOP
@@ -76,7 +77,7 @@
 				////return col;
 				return bg;
 			}
-			ENDCG
+			ENDHLSL
 		}
 	}
 }

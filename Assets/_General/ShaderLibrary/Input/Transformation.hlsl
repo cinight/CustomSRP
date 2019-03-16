@@ -79,6 +79,11 @@ float3 TransformWorldToViewDir(float3 dirWS)
     return mul((float3x3)GetWorldToViewMatrix(), dirWS).xyz;
 }
 
+float3 TransformObjectToViewPos(float3 positionOS)
+{
+    return mul(GetWorldToViewMatrix(), mul(GetObjectToWorldMatrix(), float4(positionOS, 1.0))).xyz;
+}
+
 float3 TransformWorldToObjectDir(float3 dirWS)
 {
     // Normalize to support uniform scaling
@@ -118,6 +123,35 @@ float4 TransformWViewToHClip(float3 positionVS)
 float3 TransformViewToHClipDir(float3 directionVS)
 {
     return mul((float3x3)GetViewToHClipMatrix(), directionVS);
+}
+
+
+// TODO: A similar function should be already available in SRP lib on master. Use that instead
+float4 ComputeScreenPos(float4 positionCS)
+{
+    float4 o = positionCS * 0.5f;
+    o.xy = float2(o.x, o.y * _ProjectionParams.x) + o.w;
+    o.zw = positionCS.zw;
+    return o;
+}
+
+float4 ComputeGrabScreenPos (float4 pos) 
+{
+    #if UNITY_UV_STARTS_AT_TOP
+        float scale = -1.0;
+    #else
+        float scale = 1.0;
+    #endif
+
+    float4 o = pos * 0.5f;
+    o.xy = float2(o.x, o.y*scale) + o.w;
+
+    #ifdef UNITY_SINGLE_PASS_STEREO
+        o.xy = TransformStereoScreenSpaceTex(o.xy, pos.w);
+    #endif
+    
+    o.zw = pos.zw;
+    return o;
 }
 
 #endif
