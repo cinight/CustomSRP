@@ -91,9 +91,9 @@
 					albedo = CalculateLight(IN, i,albedo);
 				}
 
-				for (int id = 4; id < min(unity_LightData.y,8); id++) 
+				for (int id2 = 4; id2 < min(unity_LightData.y,8); id2++) 
 				{
-					int i = unity_LightIndices[1][id-4];
+					int i = unity_LightIndices[1][id2-4];
 					albedo = CalculateLight(IN, i,albedo);
 				}
 				

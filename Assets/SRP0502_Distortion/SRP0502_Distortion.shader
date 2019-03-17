@@ -67,7 +67,7 @@
 				mask = saturate(mask) * _Color.a;
 				
 				//Distoriton UV
-				float noise = sin(nuv*30.0f);
+				float2 noise = sin(nuv*30.0f);
 				float2 duv = lerp(nuv-noise*_Noise,nuv+noise*_Noise,_SinTime.w);
 
 				float4 bg = tex2D(_CameraColorTexture, lerp(nuv,duv,mask)); //The background texture
