@@ -30,7 +30,7 @@ EditorBuildSettings:
     path: Assets/SRP0301_Batching/SRP0301_Batching.unity
     guid: fb75decb166a6b24ebba64fb6187eb31
   - enabled: 1
-    path: Assets/SRP0400_BuiltInVariables/SRP0400_BuiltInVariables.unity
+    path: Assets/SRP0601_RealtimeLights/SRP0601_RealtimeLights.unity
     guid: f282cc42fb1c7194d872833eabcf55c6
   - enabled: 1
     path: Assets/SRP0401_NoSpecificPass/SRP0401_NoSpecificPass.unity
