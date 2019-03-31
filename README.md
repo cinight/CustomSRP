@@ -27,6 +27,7 @@ Mac Metal Linear
 | `SRP0701_HDR_MSAA` | ![](READMEImages/SRP0701_HDR_MSAA.gif) | Use HDR and MSAA |
 | `SRP0701_Stencil` | ![](READMEImages/SRP0701_Stencil.JPG) | In order to use stencil, we need the render target having at least 24bit depth. This case we use the same pipeline with 0701 |
 | `SRP0702_Postprocessing` | ![](READMEImages/SRP0702_Postprocessing.gif) | This shows you how to use Postprocessing Stack with SRP (transparent effects e.g. Bloom, Depth of Field) |
+| `SRP0703_MotionVector` | ![](READMEImages/SRP0703_MotionVector.JPG) | Make motion blur works. Use per-object and camera motion vector |
 | `SRP0801_UGUI` | ![](READMEImages/SRP0801_UGUI.JPG) | Use UICamera to render UGUI, also render 3D objects and particle on UI |
 | `SRP0802_RenderPass` | ![](READMEImages/SRP0802_RenderPass.gif) | Use RenderPass to target multiple color attachments and read / write from / to them |
 | `SRP0803_MultiRenderTarget` | ![](READMEImages/SRP0803_MultiRenderTarget.JPG) | Use CommandBuffer.SetRenderTarget() to target multiple color surfaces |
