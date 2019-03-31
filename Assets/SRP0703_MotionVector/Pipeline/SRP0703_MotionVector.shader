@@ -173,7 +173,7 @@ Shader "Hidden/CustomSRP/SRP0703/MotionVectors"
 
             ZTest LEqual
             Cull Back
-            ZWrite Off
+            ZWrite On
 
             HLSLPROGRAM
             #pragma vertex VertMotionVectors

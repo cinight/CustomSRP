@@ -209,7 +209,7 @@ public class SRP0703Instance : RenderPipeline
             cmdMotionvector.Release();
 
             //Opaque objects
-            sortingSettings.criteria = SortingCriteria.BackToFront; //Treat it as transparent?
+            sortingSettings.criteria = SortingCriteria.CommonOpaque;
             drawSettingsMotionVector.sortingSettings = sortingSettings;
             filterSettingsMotionVector.renderQueueRange = RenderQueueRange.opaque;
             context.DrawRenderers(cull, ref drawSettingsMotionVector, ref filterSettingsMotionVector);
