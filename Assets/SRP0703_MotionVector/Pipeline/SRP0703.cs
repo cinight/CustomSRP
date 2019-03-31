@@ -6,6 +6,8 @@ using UnityEngine.Rendering.PostProcessing;
 [ExecuteInEditMode]
 public class SRP0703 : RenderPipelineAsset
 {
+    public bool motionVectorDebug = false;
+
     #if UNITY_EDITOR
     [UnityEditor.MenuItem("Assets/Create/Render Pipeline/SRP0703", priority = 1)]
     static void CreateSRP0703()
@@ -17,46 +19,78 @@ public class SRP0703 : RenderPipelineAsset
 
     protected override RenderPipeline CreatePipeline()
     {
-        return new SRP0703Instance();
+        return new SRP0703Instance(motionVectorDebug);
     }
 }
 
 public class SRP0703Instance : RenderPipeline
 {
+    private bool _motionVectorDebug;
+
     private static readonly ShaderTagId m_PassName = new ShaderTagId("SRP0703_Pass"); //The shader pass tag just for SRP0703
-    //private static readonly ShaderTagId m_PassNameMotionVector = new ShaderTagId("SRP0703_MotionVector");  //For motionvector, using internal shader
 
     private static Material depthOnlyMaterial;
     private static Material motionVectorMaterial;
+
+    private static Material motionVectorDebugMaterial; //For Debug
+
     private static int m_ColorRTid = Shader.PropertyToID("_CameraColorTexture");
     private static int m_DepthRTid = Shader.PropertyToID("_CameraDepthTexture");
     private static int m_MotionVectorRTid = Shader.PropertyToID("_CameraMotionVectorsTexture");
-    // private Matrix4x4 _viewProjMatrix;
-    // private Matrix4x4 _prevViewProjMatrix;
-    // private Matrix4x4 _nonJitteredProjMatrix;
-    // private Matrix4x4 _nonJitteredViewProjMatrix;
-    // private Matrix4x4 _gpuNonJitteredProj;
-    // private Matrix4x4 _gpuProj;
-    // private Matrix4x4 _viewMatrix;
-    // private Matrix4x4 _projMatrix;
-    // private Matrix4x4 _gpuView;
-    //private Vector4 _screenSize;
-    //private Matrix4x4 _previousLocalToWorld;
-    private Matrix4x4 _NonJitteredVP;
-    private Matrix4x4 _PreviousVP;
+
     private static RenderTargetIdentifier m_ColorRT = new RenderTargetIdentifier(m_ColorRTid);
     private static RenderTargetIdentifier m_DepthRT = new RenderTargetIdentifier(m_DepthRTid);
     private static RenderTargetIdentifier m_MotionVectorRT = new RenderTargetIdentifier(m_MotionVectorRTid);
-    private static UnityEngine.Experimental.Rendering.GraphicsFormat m_ColorFormatHDR = SystemInfo.GetGraphicsFormat(UnityEngine.Experimental.Rendering.DefaultFormat.HDR);
-    private static UnityEngine.Experimental.Rendering.GraphicsFormat m_ColorFormat = SystemInfo.GetGraphicsFormat(UnityEngine.Experimental.Rendering.DefaultFormat.LDR);
-    private static UnityEngine.Experimental.Rendering.GraphicsFormat m_MotionVectorFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.R16G16_SFloat;
-    private static UnityEngine.Experimental.Rendering.GraphicsFormat m_ColorFormatActive; //The one that is actually using
     private int depthBufferBits = 24;
 
-    public SRP0703Instance()
+    private static UnityEngine.Experimental.Rendering.GraphicsFormat m_ColorFormatHDR = SystemInfo.GetGraphicsFormat(UnityEngine.Experimental.Rendering.DefaultFormat.HDR);
+    private static UnityEngine.Experimental.Rendering.GraphicsFormat m_ColorFormat = SystemInfo.GetGraphicsFormat(UnityEngine.Experimental.Rendering.DefaultFormat.LDR);
+    private static UnityEngine.Experimental.Rendering.GraphicsFormat m_ColorFormatActive; //The one that is actually using
+
+    //For camera motion vector
+    private Matrix4x4 _NonJitteredVP;
+    private Matrix4x4 _PreviousVP;
+    static Mesh s_FullscreenMesh = null;
+    public static Mesh fullscreenMesh
+    {
+        get
+        {
+            if (s_FullscreenMesh != null)
+                return s_FullscreenMesh;
+
+            float topV = 1.0f;
+            float bottomV = 0.0f;
+
+            s_FullscreenMesh = new Mesh { name = "Fullscreen Quad" };
+            s_FullscreenMesh.SetVertices(new List<Vector3>
+            {
+                new Vector3(-1.0f, -1.0f, 0.0f),
+                new Vector3(-1.0f,  1.0f, 0.0f),
+                new Vector3(1.0f, -1.0f, 0.0f),
+                new Vector3(1.0f,  1.0f, 0.0f)
+            });
+
+            s_FullscreenMesh.SetUVs(0, new List<Vector2>
+            {
+                new Vector2(0.0f, bottomV),
+                new Vector2(0.0f, topV),
+                new Vector2(1.0f, bottomV),
+                new Vector2(1.0f, topV)
+            });
+
+            s_FullscreenMesh.SetIndices(new[] { 0, 1, 2, 2, 1, 3 }, MeshTopology.Triangles, 0, false);
+            s_FullscreenMesh.UploadMeshData(true);
+            return s_FullscreenMesh;
+        }
+    }
+
+    public SRP0703Instance(bool motionVectorDebug)
     {
         depthOnlyMaterial = new Material(Shader.Find("Hidden/CustomSRP/SRP0703/DepthOnly"));
-        motionVectorMaterial = new Material(Shader.Find("Hidden/Internal-MotionVectors"));
+        motionVectorMaterial = new Material(Shader.Find("Hidden/CustomSRP/SRP0703/MotionVectors"));
+
+        _motionVectorDebug = motionVectorDebug;
+        motionVectorDebugMaterial = new Material(Shader.Find("MotionVectorsDebug"));
     }
 
     protected override void Render(ScriptableRenderContext context, Camera[] cameras)
@@ -96,54 +130,51 @@ public class SRP0703Instance : RenderPipeline
             colorRTDesc.enableRandomWrite = false;
             cmdTempId.GetTemporaryRT(m_ColorRTid, colorRTDesc,FilterMode.Bilinear);
 
-            //MotionVector
-            RenderTextureDescriptor motionvectorRTDesc = new RenderTextureDescriptor(camera.pixelWidth, camera.pixelHeight);
-            motionvectorRTDesc.graphicsFormat = m_MotionVectorFormat;
-            motionvectorRTDesc.depthBufferBits = depthBufferBits;
-            //colorRTDesc.sRGB = ;
-            motionvectorRTDesc.msaaSamples = 1;
-            motionvectorRTDesc.enableRandomWrite = false;
-            cmdTempId.GetTemporaryRT(m_MotionVectorRTid, motionvectorRTDesc,FilterMode.Bilinear);
-
             //Depth
             RenderTextureDescriptor depthRTDesc = new RenderTextureDescriptor(camera.pixelWidth, camera.pixelHeight);
             depthRTDesc.colorFormat = RenderTextureFormat.Depth;
             depthRTDesc.depthBufferBits = depthBufferBits;
             cmdTempId.GetTemporaryRT(m_DepthRTid, depthRTDesc,FilterMode.Bilinear);
 
+            //MotionVector
+            RenderTextureDescriptor motionvectorRTDesc = new RenderTextureDescriptor(camera.pixelWidth, camera.pixelHeight);
+            motionvectorRTDesc.graphicsFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.R16G16_SFloat;
+            motionvectorRTDesc.depthBufferBits = depthBufferBits;
+            //colorRTDesc.sRGB = ;
+            motionvectorRTDesc.msaaSamples = 1;
+            motionvectorRTDesc.enableRandomWrite = false;
+            cmdTempId.GetTemporaryRT(m_MotionVectorRTid, motionvectorRTDesc,FilterMode.Bilinear);
+
             context.ExecuteCommandBuffer(cmdTempId);
             cmdTempId.Release();
 
-            //************************** Setup DrawSettings and FilterSettings ************************************
+           //************************** Setup DrawSettings and FilterSettings ************************************
 
             camera.depthTextureMode |= DepthTextureMode.MotionVectors | DepthTextureMode.Depth;
 
             var sortingSettings = new SortingSettings(camera);
-            DrawingSettings drawSettings = new DrawingSettings(m_PassName, sortingSettings)
+
+            DrawingSettings drawSettings = new DrawingSettings(m_PassName, sortingSettings);
+            FilteringSettings filterSettings = new FilteringSettings(RenderQueueRange.all);
+
+            DrawingSettings drawSettingsMotionVector = new DrawingSettings(m_PassName, sortingSettings)
             {
-                perObjectData = PerObjectData.MotionVectors
+                perObjectData = PerObjectData.MotionVectors,
+                overrideMaterial = motionVectorMaterial,
+                overrideMaterialPassIndex = 0
             };
-            FilteringSettings filterSettings = new FilteringSettings(RenderQueueRange.all)
+            FilteringSettings filterSettingsMotionVector = new FilteringSettings(RenderQueueRange.all)
             {
                 excludeMotionVectorObjects = false
             };
-            //FilteringSettings filterSettingsMotionVector = new FilteringSettings(RenderQueueRange.all)
-
 
             DrawingSettings drawSettingsDepth = new DrawingSettings(m_PassName, sortingSettings)
             {
                 //perObjectData = PerObjectData.None,
                 overrideMaterial = depthOnlyMaterial,
-                overrideMaterialPassIndex = 0
+                overrideMaterialPassIndex = 0,
             };
-
-            //DrawingSettings drawSettingsMotionVector = new DrawingSettings(m_PassName, sortingSettings)
-            //{
-               // perObjectData = PerObjectData.MotionVectors,
-                //overrideMaterial = motionVectorMaterial,
-                //overrideMaterialPassIndex = 1
-            //};
-            //drawSettingsMotionVector.SetShaderPassName(1,m_PassNameMotionVector);
+            FilteringSettings filterSettingsDepth = new FilteringSettings(RenderQueueRange.all);
 
             //************************** Rendering depth ************************************
 
@@ -158,8 +189,8 @@ public class SRP0703Instance : RenderPipeline
             //Opaque objects
             sortingSettings.criteria = SortingCriteria.CommonOpaque;
             drawSettingsDepth.sortingSettings = sortingSettings;
-            filterSettings.renderQueueRange = RenderQueueRange.opaque;
-            context.DrawRenderers(cull, ref drawSettingsDepth, ref filterSettings);
+            filterSettingsDepth.renderQueueRange = RenderQueueRange.opaque;
+            context.DrawRenderers(cull, ref drawSettingsDepth, ref filterSettingsDepth);
 
             //To let shader has _CameraDepthTexture
             CommandBuffer cmdDepthTexture = new CommandBuffer();
@@ -168,11 +199,44 @@ public class SRP0703Instance : RenderPipeline
             context.ExecuteCommandBuffer(cmdDepthTexture);
             cmdDepthTexture.Release();
 
-            //************************** Rendering colors ************************************
+            //************************** Rendering motion vectors ************************************
+
+            //Camera clear flag
+            CommandBuffer cmdMotionvector = new CommandBuffer();
+            cmdMotionvector.SetRenderTarget(m_MotionVectorRT); //Set CameraTarget to the motion vector texture
+            cmdMotionvector.ClearRenderTarget(true, true, Color.black);
+            context.ExecuteCommandBuffer(cmdMotionvector);
+            cmdMotionvector.Release();
+
+            //Opaque objects
+            sortingSettings.criteria = SortingCriteria.BackToFront; //Treat it as transparent?
+            drawSettingsMotionVector.sortingSettings = sortingSettings;
+            filterSettingsMotionVector.renderQueueRange = RenderQueueRange.opaque;
+            context.DrawRenderers(cull, ref drawSettingsMotionVector, ref filterSettingsMotionVector);
+
+            //Camera motion vector
+            CommandBuffer cmdCameraMotionVector = new CommandBuffer();
+            cmdCameraMotionVector.name = "("+camera.name+")"+ "Camera MotionVector";
+            _NonJitteredVP = camera.nonJitteredProjectionMatrix * camera.worldToCameraMatrix;
+            cmdCameraMotionVector.SetGlobalMatrix("_CamPrevViewProjMatrix", _PreviousVP );
+            cmdCameraMotionVector.SetGlobalMatrix("_CamNonJitteredViewProjMatrix",  _NonJitteredVP);
+            cmdCameraMotionVector.SetViewProjectionMatrices(Matrix4x4.identity, Matrix4x4.identity);
+            cmdCameraMotionVector.DrawMesh( fullscreenMesh, Matrix4x4.identity, motionVectorMaterial, 0, 1, null); // draw full screen quad to make Camera motion
+            cmdCameraMotionVector.SetViewProjectionMatrices(camera.worldToCameraMatrix, camera.projectionMatrix);
+            context.ExecuteCommandBuffer(cmdCameraMotionVector);
+            cmdCameraMotionVector.Release();
             
-            //Set RenderTarget & Camera clear flag
+            //To let shader has MotionVectorTexture
+            CommandBuffer cmdMotionVectorTexture = new CommandBuffer();
+            cmdMotionVectorTexture.name = "("+camera.name+")"+ "MotionVector Texture";            
+            cmdMotionVectorTexture.SetGlobalTexture(m_MotionVectorRTid,m_MotionVectorRT);
+            context.ExecuteCommandBuffer(cmdMotionVectorTexture);
+            cmdMotionVectorTexture.Release();
+
+            //************************** Rendering color ************************************
+
+            //Camera clear flag
             CommandBuffer cmd = new CommandBuffer();
-            cmd.name = "("+camera.name+")"+ "Clear Flag";
             cmd.SetRenderTarget(m_ColorRT); //Set CameraTarget to the color texture
             cmd.ClearRenderTarget(clearDepth, clearColor, camera.backgroundColor);
             context.ExecuteCommandBuffer(cmd);
@@ -181,110 +245,46 @@ public class SRP0703Instance : RenderPipeline
             //Skybox
             if(drawSkyBox)  {  context.DrawSkybox(camera);  }
 
-            //************************** Rendering Opaque Objects ************************************
-
+            //Opaque objects
             sortingSettings.criteria = SortingCriteria.CommonOpaque;
             drawSettings.sortingSettings = sortingSettings;
             filterSettings.renderQueueRange = RenderQueueRange.opaque;
             context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
-
-            //************************** Rendering motion vector ************************************
-            //_screenSize = new Vector4(camera.pixelWidth, camera.pixelHeight, 1.0f / camera.pixelWidth, 1.0f / camera.pixelHeight);
-            //_nonJitteredViewProjMatrix = _nonJitteredProjMatrix * _viewMatrix;
-            _NonJitteredVP = camera.nonJitteredProjectionMatrix * camera.worldToCameraMatrix;
-            // var nonJitteredCameraProj = camera.projectionMatrix;
-            // _gpuNonJitteredProj = GL.GetGPUProjectionMatrix(nonJitteredCameraProj, true);
-            // _gpuView = camera.worldToCameraMatrix;
-            // var cameraProj = /* taaEnabled
-            //                 ? postProcessLayer.temporalAntialiasing.GetJitteredProjectionMatrix(camera)
-            //                 : */ nonJitteredCameraProj;
-            // _gpuProj = GL.GetGPUProjectionMatrix(cameraProj, true); 
-            // _viewProjMatrix = _projMatrix * _viewMatrix;
-
-            //Set RenderTarget & Camera clear flag
-            CommandBuffer cmdMotionvector = new CommandBuffer();
-            cmdMotionvector.name = "("+camera.name+")"+ "MotionVector Clear Flag";
-            cmdMotionvector.SetRenderTarget(m_MotionVectorRT); //Set CameraTarget to the depth texture
-            cmdMotionvector.ClearRenderTarget(true, true, Color.black);
-
-            // Matrix4x4 unityVP = new Matrix4x4();
-			// unityVP.SetRow(0, new Vector4(2,0,0,-1));
-			// unityVP.SetRow(1, new Vector4(0,-2,0,1));
-			// unityVP.SetRow(2, new Vector4(0,0,0.001f,1));
-			// unityVP.SetRow(3, new Vector4(0,0,0,1));
-
-            // motionVectorMaterial.SetMatrix("unity_MatrixVP",unityVP);
-
-
-
-
-
-            //https://github.com/Unity-Technologies/FPSSample/blob/afe712c2af789ec08273a63b177f8b4acba36584/Packages/com.unity.render-pipelines.high-definition/Runtime/RenderPipeline/Camera/HDCamera.cs
-            //cmdMotionvector.SetGlobalMatrix("_PreviousM", _previousLocalToWorld);
-            cmdMotionvector.SetGlobalMatrix("_PreviousVP",     _PreviousVP   /* camera.previousViewProjectionMatrix */);
-            cmdMotionvector.SetGlobalMatrix("_NonJitteredVP",        _NonJitteredVP);
-            //cmdMotionvector.SetGlobalVector("_ScreenSize",                _screenSize);
-            //cmdMotionvector.SetGlobalMatrix("_NonJitteredViewProjMatrix", _nonJitteredViewProjMatrix);
-            //cmdMotionvector.SetGlobalMatrix("_ViewProjMatrix",            _viewProjMatrix);
-            //cmdMotionvector.SetGlobalMatrix("_InvViewProjMatrix",         _viewProjMatrix.inverse);
-
-
-
-
-            context.ExecuteCommandBuffer(cmdMotionvector);
-            cmdMotionvector.Release();
-
-            //Opaque objects
-            //sortingSettings.criteria = SortingCriteria.CommonOpaque;
-            //filterSettingsMotionVector.renderQueueRange = RenderQueueRange.opaque;
-            //context.DrawRenderers(cull, ref drawSettingsMotionVector, ref filterSettingsMotionVector);
-            //
-            
-            //Generate Camera Motion Vector
-            //To let shader has _CameraMotionVectorsTexture & properties, to make MotionBlur work
-            CommandBuffer cmdMotionVectorTexture = new CommandBuffer();
-            cmdMotionVectorTexture.name = "("+camera.name+")"+ "MotionVector Texture";
-            cmdMotionVectorTexture.DrawProcedural(Matrix4x4.identity, motionVectorMaterial, 1, MeshTopology.Triangles, 3, 1, null);
-            //cmdMotionVectorTexture.Blit(BuiltinRenderTextureType.MotionVectors,m_MotionVectorRT);
-            cmdMotionVectorTexture.SetGlobalTexture(m_MotionVectorRTid,m_MotionVectorRT);
-            cmdMotionVectorTexture.SetRenderTarget(m_ColorRT);
-            context.ExecuteCommandBuffer(cmdMotionVectorTexture);
-            cmdMotionVectorTexture.Release();
 
             //************************** SetUp Post-processing ************************************
             
             PostProcessLayer m_CameraPostProcessLayer = camera.GetComponent<PostProcessLayer>();
             bool hasPostProcessing = m_CameraPostProcessLayer != null;
             bool usePostProcessing =  false;
-            bool hasOpaqueOnlyEffects = false;
+            //bool hasOpaqueOnlyEffects = false;
             PostProcessRenderContext m_PostProcessRenderContext = null;
             if(hasPostProcessing)
             {
                 m_PostProcessRenderContext = new PostProcessRenderContext();
                 usePostProcessing =  m_CameraPostProcessLayer.enabled;
-                hasOpaqueOnlyEffects = m_CameraPostProcessLayer.HasOpaqueOnlyEffects(m_PostProcessRenderContext);
+                //hasOpaqueOnlyEffects = m_CameraPostProcessLayer.HasOpaqueOnlyEffects(m_PostProcessRenderContext);
             }
             
             //************************** Opaque Post-processing ************************************
             //Ambient Occlusion, Screen-spaced reflection are generally not supported for SRP
             //So this part is only for custom opaque post-processing
-            if(usePostProcessing)
-            {
-                CommandBuffer cmdpp = new CommandBuffer();
-                cmdpp.name = "("+camera.name+")"+ "Post-processing Opaque";
+            // if(usePostProcessing)
+            // {
+            //     CommandBuffer cmdpp = new CommandBuffer();
+            //     cmdpp.name = "("+camera.name+")"+ "Post-processing Opaque";
 
-                m_PostProcessRenderContext.Reset();
-                m_PostProcessRenderContext.camera = camera;
-                m_PostProcessRenderContext.source = m_ColorRT;
-                m_PostProcessRenderContext.sourceFormat = UnityEngine.Experimental.Rendering.GraphicsFormatUtility.GetRenderTextureFormat(m_ColorFormatActive);
-                m_PostProcessRenderContext.destination = m_ColorRT;
-                m_PostProcessRenderContext.command = cmdpp;
-                m_PostProcessRenderContext.flip = camera.targetTexture == null;
-                m_CameraPostProcessLayer.RenderOpaqueOnly(m_PostProcessRenderContext);
+            //     m_PostProcessRenderContext.Reset();
+            //     m_PostProcessRenderContext.camera = camera;
+            //     m_PostProcessRenderContext.source = m_ColorRT;
+            //     m_PostProcessRenderContext.sourceFormat = UnityEngine.Experimental.Rendering.GraphicsFormatUtility.GetRenderTextureFormat(m_ColorFormatActive);
+            //     m_PostProcessRenderContext.destination = m_ColorRT;
+            //     m_PostProcessRenderContext.command = cmdpp;
+            //     m_PostProcessRenderContext.flip = camera.targetTexture == null;
+            //     m_CameraPostProcessLayer.RenderOpaqueOnly(m_PostProcessRenderContext);
                
-                context.ExecuteCommandBuffer(cmdpp);
-                cmdpp.Release();
-            }
+            //     context.ExecuteCommandBuffer(cmdpp);
+            //     cmdpp.Release();
+            // }
 
             //************************** Rendering Transparent Objects ************************************
 
@@ -294,7 +294,7 @@ public class SRP0703Instance : RenderPipeline
             context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
 
             //************************** Transparent Post-processing ************************************
-            //Bloom, Vignette, Grain, ColorGrading, LensDistortion, Chromatic Aberration, Auto Exposure
+            //Bloom, Vignette, Grain, ColorGrading, LensDistortion, Chromatic Aberration, Auto Exposure, Motion Blur
             if(usePostProcessing)
             {
                 CommandBuffer cmdpp = new CommandBuffer();
@@ -312,10 +312,9 @@ public class SRP0703Instance : RenderPipeline
                 context.ExecuteCommandBuffer(cmdpp);
                 cmdpp.Release();
             }
-
-            //************************** Make sure screen has the thing when Postprocessing is off ************************************
-            if(!usePostProcessing)
+            else
             {
+                //Make sure screen has the thing when Postprocessing is off
                 CommandBuffer cmdBlitToCam = new CommandBuffer();
                 cmdBlitToCam.name = "("+camera.name+")"+ "Blit back to Camera";
                 cmdBlitToCam.Blit(m_ColorRTid, BuiltinRenderTextureType.CameraTarget);
@@ -323,7 +322,18 @@ public class SRP0703Instance : RenderPipeline
                 cmdBlitToCam.Release();
             }
 
+            //************************** Debug ************************************
+
+            if(_motionVectorDebug)
+            {
+                CommandBuffer cmdDebug = new CommandBuffer();
+                cmdDebug.Blit(BuiltinRenderTextureType.CameraTarget,BuiltinRenderTextureType.CameraTarget,motionVectorDebugMaterial);
+                context.ExecuteCommandBuffer(cmdDebug);
+                cmdDebug.Release();
+            }
+
             //************************** Clean Up ************************************
+
             CommandBuffer cmdclean = new CommandBuffer();
             cmdclean.name = "("+camera.name+")"+ "Clean Up";
             cmdclean.ReleaseTemporaryRT(m_ColorRTid);
@@ -333,12 +343,9 @@ public class SRP0703Instance : RenderPipeline
             cmdclean.Release();
 
             context.Submit();
+
+            //For camera motion vector
             _PreviousVP = _NonJitteredVP;
-            // _prevViewProjMatrix = _nonJitteredViewProjMatrix;
-            // _nonJitteredProjMatrix = _gpuNonJitteredProj;
-            // _viewMatrix = _gpuView;
-            // _projMatrix = _gpuProj;
-            // _previousLocalToWorld = camera.transform.localToWorldMatrix;
         }
     }
 }

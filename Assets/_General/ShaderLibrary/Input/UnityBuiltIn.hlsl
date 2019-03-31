@@ -122,6 +122,16 @@ real4 unity_SHBr;
 real4 unity_SHBg;
 real4 unity_SHBb;
 real4 unity_SHC;
+
+// Velocity //From HDRP shader library
+float4x4 unity_MatrixPreviousM;
+float4x4 unity_MatrixPreviousMI;
+//X : Use last frame positions (right now skinned meshes are the only objects that use this
+//Y : Force No Motion
+//Z : Z bias value
+//W : Camera only
+float4 unity_MotionVectorsParams;
+
 CBUFFER_END
 
 #if defined(UNITY_STEREO_MULTIVIEW_ENABLED) || ((defined(UNITY_SINGLE_PASS_STEREO) || defined(UNITY_STEREO_INSTANCING_ENABLED)) && (defined(SHADER_API_GLCORE) || defined(SHADER_API_GLES3) || defined(SHADER_API_METAL)))
