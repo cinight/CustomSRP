@@ -35,8 +35,8 @@ Mac Metal Linear
 | `SRP0902_SceneViewDrawMode` | ![](READMEImages/SRP0902_SceneViewDrawMode.gif) | Adding custom Scene View draw modes |
 | `SRP1001_Error` | ![](READMEImages/SRP1001_Error.JPG) | Render the pink shaders on the materials that the SRP doesn't support |
 | `SRP1002_Debug` | ![](READMEImages/SRP1002_Debug.JPG) | Make the Profiler records the timing for SRP performance debugging |
+| `SRP1003_DefaultShaders` | ![](READMEImages/SRP1003_DefaultShaders.gif) | Set pipeline default materials when creating new material / objects / particle / terrain etc |
 | `xxxx` | ![](READMEImages/xxxx.gif) | xxxxxx |
-
 
 -------------
 References: \
