@@ -1,7 +1,7 @@
 # CustomSRP
 A new SRP from scratch
 
-Unity version : 2019.1.0b4
+Unity version : 2019.1.0b10
 
 Tested with : 
 Win DX11 Gamma / Linear
@@ -44,3 +44,4 @@ References: \
 [SRPFromScratch by pbbastian](https://github.com/pbbastian/SRPFromScratch) \
 Siggraph 2018 SRP presentation by Matt Dean \
 [Custom Pipeline by Catlike Coding](https://catlikecoding.com/unity/tutorials/scriptable-render-pipeline/)
+[LWRP & HDRP](https://github.com/Unity-Technologies/ScriptableRenderPipeline)
