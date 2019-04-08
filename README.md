@@ -43,5 +43,5 @@ References: \
 [My first custom SRP study for Unity2018.3](https://cmwdexint.com/2018/05/24/custom-srp/) \
 [SRPFromScratch by pbbastian](https://github.com/pbbastian/SRPFromScratch) \
 Siggraph 2018 SRP presentation by Matt Dean \
-[Custom Pipeline by Catlike Coding](https://catlikecoding.com/unity/tutorials/scriptable-render-pipeline/)
+[Custom Pipeline by Catlike Coding](https://catlikecoding.com/unity/tutorials/scriptable-render-pipeline/) \
 [LWRP & HDRP](https://github.com/Unity-Technologies/ScriptableRenderPipeline)
