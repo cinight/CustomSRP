@@ -10,7 +10,6 @@ Mac Metal Linear
 | Scene | Image | Description |
 | --- | - | --- |
 | `SRP0101_Basic` | ![](READMEImages/SRP0101_Basic.JPG) | Super basic SRP that renders unlit material objects |
-| `SRP0101_Fog` | ![](READMEImages/SRP0101_Fog.gif) | Use Fog on Lighting Settings |
 | `SRP0102_AssetSettings` | ![](READMEImages/SRP0102_AssetSettings.gif) | Let the SRP Asset to pass some custom variables |
 | `SRP0103_CustomGUI` | ![](READMEImages/SRP0103_CustomGUI.gif) | Have a proper interface for the SRP Asset |
 | `SRP0201_FrustumCulling` | ![](READMEImages/SRP0201_FrustumCulling.gif) | Frustum culling always work. This is a test scene to verify the culling results |
@@ -22,6 +21,7 @@ Mac Metal Linear
 | `SRP0405_Callback` | ![](READMEImages/SRP0405_Callback.JPG) | Make your custom callback function so that you can insert extra rendering code with other scripts |
 | `SRP0501_SoftParticle` | ![](READMEImages/SRP0501_SoftParticle.JPG) | Setup CameraDepthTexture to achieve soft-particle effect |
 | `SRP0502_Distortion` | ![](READMEImages/SRP0502_Distortion.gif) | No more grab pass but we can implement our own |
+| `SRP0101_Fog` | ![](READMEImages/SRP0101_Fog.gif) | Use Fog on Lighting Settings |
 | `SRP0601_RealtimeLights` | ![](READMEImages/SRP0601_RealtimeLights.JPG) | Directional / Point / Spot lights and setup PerObject light data |
 | `SRP0602_BakedLights` | ![](READMEImages/SRP0602_BakedLights.JPG) | Baked Lightmap / Reflection Probe / Light Probes and setup PerObject data for them |
 | `SRP0701_HDR_MSAA` | ![](READMEImages/SRP0701_HDR_MSAA.gif) | Use HDR and MSAA |
