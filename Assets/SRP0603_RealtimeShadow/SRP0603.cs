@@ -132,7 +132,7 @@ public class SRP0603Instance : RenderPipeline
             cmdDepthTexture.Release();
 
             //SetUp Lighting & shadow variables
-            SetUpRealtimeLightingVariables(context,cull);
+            SetUpRealtimeLightingVariables(camera, context,cull);
 
             //Debug **********************************************
             // CommandBuffer cmdDebug = new CommandBuffer();
@@ -140,9 +140,6 @@ public class SRP0603Instance : RenderPipeline
             // cmdDebug.Blit( m_ShadowMap, BuiltinRenderTextureType.CameraTarget );
             // context.ExecuteCommandBuffer(cmdDebug);
             // cmdDebug.Release();
-
-            //Camera setup some builtin variables e.g. camera projection matrices etc
-            context.SetupCameraProperties(camera);
 
             // Color Rendering============================================================================
 
@@ -186,7 +183,7 @@ public class SRP0603Instance : RenderPipeline
         }
     }
 
-    private void SetUpRealtimeShadowVariables(ScriptableRenderContext context, CullingResults cull, Light light, int lightIndex)
+    private void SetUpRealtimeShadowVariables(Camera cam, ScriptableRenderContext context, CullingResults cull, Light light, int lightIndex)
     {
         Bounds bounds;
         bool doShadow = light.shadows != LightShadows.None && cull.GetShadowCasterBounds(lightIndex, out bounds);
@@ -235,44 +232,42 @@ public class SRP0603Instance : RenderPipeline
             }
             else return;
 
-            CommandBuffer cmdShadow = new CommandBuffer();
-            cmdShadow.name = "Shadow Mapping: light"+lightIndex;
-            cmdShadow.SetRenderTarget(m_ShadowMapLight);
-            cmdShadow.ClearRenderTarget(true, true, Color.black);
+            //Debug.Log(light.type + " "+successShadowMap);
 
-            //Change the view to light's point of view
-            cmdShadow.SetViewport(new Rect(0, 0, m_ShadowRes, m_ShadowRes));
-            cmdShadow.EnableScissorRect(new Rect(4, 4, m_ShadowRes - 8, m_ShadowRes - 8));
-            cmdShadow.SetViewProjectionMatrices(view, proj);
-            context.ExecuteCommandBuffer(cmdShadow);
-            cmdShadow.Clear();
-
-            //Render Shadowmap
-            context.DrawShadows(ref shadowSettings);
-            
-            //Set shadowmap texture
-            cmdShadow.DisableScissorRect();
-            cmdShadow.SetGlobalTexture(m_ShadowMapLightid, m_ShadowMapLight);
-            context.ExecuteCommandBuffer(cmdShadow);
-            cmdShadow.Clear();
-            cmdShadow.Release();
-
-            //Screen Space Shadow =================================================
-            CommandBuffer cmdShadow2 = new CommandBuffer();
-            cmdShadow2.name = "Screen Space Shadow: light"+lightIndex;
-
-            //Bias
-            float sign = (SystemInfo.usesReversedZBuffer) ? 1.0f : -1.0f;
-            //if(isSceneViewCam) sign = - sign * 0.01f;
-            float bias = light.shadowBias * proj.m22 * sign;
-            cmdShadow2.SetGlobalFloat("_ShadowBias", bias);
-
-            //Shadow Transform
             if(successShadowMap)
             {
-                cmdShadow2.EnableShaderKeyword("SHADOWS_SCREEN");
-                cmdShadow2.EnableShaderKeyword("LIGHTMAP_SHADOW_MIXING");
+                CommandBuffer cmdShadow = new CommandBuffer();
+                cmdShadow.name = "Shadow Mapping: light"+lightIndex;
+                cmdShadow.SetRenderTarget(m_ShadowMapLight);
+                cmdShadow.ClearRenderTarget(true, true, Color.black);
+                //Change the view to light's point of view
+                cmdShadow.SetViewport(new Rect(0, 0, m_ShadowRes, m_ShadowRes));
+                cmdShadow.EnableScissorRect(new Rect(4, 4, m_ShadowRes - 8, m_ShadowRes - 8));
+                cmdShadow.SetViewProjectionMatrices(view, proj);
+                context.ExecuteCommandBuffer(cmdShadow);
+                cmdShadow.Clear();
+
+                //Render Shadowmap
+                context.DrawShadows(ref shadowSettings);
                 
+                //Set shadowmap texture
+                cmdShadow.DisableScissorRect();
+                cmdShadow.SetViewProjectionMatrices(cam.worldToCameraMatrix, cam.projectionMatrix);
+                cmdShadow.SetGlobalTexture(m_ShadowMapLightid, m_ShadowMapLight);
+                context.ExecuteCommandBuffer(cmdShadow);
+                cmdShadow.Clear();
+                cmdShadow.Release();
+
+                //Screen Space Shadow =================================================
+                CommandBuffer cmdShadow2 = new CommandBuffer();
+                cmdShadow2.name = "Screen Space Shadow: light"+lightIndex;
+
+                //Bias
+                float sign = (SystemInfo.usesReversedZBuffer) ? 1.0f : -1.0f;
+                float bias = light.shadowBias * proj.m22 * sign;
+                cmdShadow2.SetGlobalFloat("_ShadowBias", bias);
+
+                //Shadow Transform                
                 if (SystemInfo.usesReversedZBuffer)
                 {
                     proj.m20 = -proj.m20;
@@ -297,17 +292,17 @@ public class SRP0603Instance : RenderPipeline
 
                 cmdShadow2.SetGlobalMatrix("_WorldToShadow", WorldToShadow);
                 cmdShadow2.SetGlobalFloat("_ShadowStrength", light.shadowStrength);
-            }
 
-            //Render the screen-space shadow
-            cmdShadow2.Blit(m_ShadowMap, m_ShadowMap, m_ScreenSpaceShadowsMaterial);
-            cmdShadow2.SetGlobalTexture(m_ShadowMapid,m_ShadowMap);
-            context.ExecuteCommandBuffer(cmdShadow2);
-            cmdShadow2.Release();
+                //Render the screen-space shadow
+                cmdShadow2.Blit(m_ShadowMap, m_ShadowMap, m_ScreenSpaceShadowsMaterial);
+                cmdShadow2.SetGlobalTexture(m_ShadowMapid,m_ShadowMap);
+                context.ExecuteCommandBuffer(cmdShadow2);
+                cmdShadow2.Release();
+            }
         }
     }
 
-    private void SetUpRealtimeLightingVariables(ScriptableRenderContext context, CullingResults cull)
+    private void SetUpRealtimeLightingVariables(Camera cam, ScriptableRenderContext context, CullingResults cull)
     {
         for (var i = 0; i < lightCount; i++)
         {
@@ -327,7 +322,7 @@ public class SRP0603Instance : RenderPipeline
                 //setup shadow
                 // shadow = ConfigureShadows(i, light.light);
                 // shadow.z = 1f;
-                SetUpRealtimeShadowVariables(context, cull, light.light, i);
+                SetUpRealtimeShadowVariables(cam, context, cull, light.light, i);
                 
             }
             else if (light.lightType == LightType.Point)
@@ -337,7 +332,7 @@ public class SRP0603Instance : RenderPipeline
                 lightColor[i] = light.finalColor;
                 lightColor[i].w = -2; //for identifying it is a point light in shader
 
-                SetUpRealtimeShadowVariables(context, cull, light.light, i);
+                SetUpRealtimeShadowVariables(cam, context, cull, light.light, i);
             }
             else if (light.lightType == LightType.Spot)
             {
@@ -363,7 +358,7 @@ public class SRP0603Instance : RenderPipeline
                 // //setup shadow
                 // shadow = ConfigureShadows(i, light.light);
 
-                SetUpRealtimeShadowVariables(context, cull, light.light, i);
+                SetUpRealtimeShadowVariables(cam, context, cull, light.light, i);
             }
             else
             {

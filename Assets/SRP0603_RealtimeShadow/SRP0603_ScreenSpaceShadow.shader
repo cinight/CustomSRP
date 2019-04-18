@@ -14,7 +14,6 @@
             HLSLPROGRAM
             #pragma vertex   Vertex
             #pragma fragment Fragment
-            #pragma multi_compile __ _FLIPUV
 
             #include "../_General/ShaderLibrary/Input/Transformation.hlsl"
 
@@ -58,11 +57,6 @@
                 projPos.xy = projPos.xy + projPos.w;
 
                 o.texcoord.xy = i.texcoord;
-
-                //#if defined(UNITY_UV_STARTS_AT_TOP) && !defined(_FLIPUV)
-				//	o.texcoord.y = 1-o.texcoord.y;
-				//#endif
-
                 o.texcoord.zw = projPos.xy;
 
                 o.uv = i.uv;
@@ -95,32 +89,14 @@
                 //World
                 float3 wpos = mul(unity_CameraToWorld, float4(vpos, 1)).xyz;
 
-                //Debug matrix when direction = 60, 0 ,0
-                float4x4 wts = {
-                    0.032, 0, 0, 0.5,
-                    0, 0.016, 0.028, 0.4,
-                    0, 0.024, -0.014, 0.49,
-                    0, 0, 0, 1
-                };
-
                 //Fetch shadow coordinates for cascade.
                 //float4 coords  = mul(wts, float4(wpos, 1.0));
                 float4 coords  = mul(_WorldToShadow, float4(wpos, 1.0));
-
-
-
-                // Screenspace shadowmap is only used for directional lights which use orthogonal projection.
-                //half shadowStrength = 1;
 
                 coords.xyz /= coords.w;
                 float attenuation = _ShadowMap.SampleCmpLevelZero(sampler_ShadowMap, coords.xy, coords.z);
                 float oneMinusT = 1.0 - _ShadowStrength;
                 attenuation = oneMinusT + attenuation * _ShadowStrength;
-
-                //float4 d = 0;
-                //d = _ShadowMap.Sample(sampler_ShadowMap_state, i.texcoord.xy);
-
-                //d = _CameraDepthTexture.Sample(sampler_CameraDepthTexture, i.texcoord.xy);
 
                 float4 final = tex2D(_ShadowMapTexture,i.uv);
                 final.rgb *= attenuation;
