@@ -22,18 +22,18 @@
 	}
 	SubShader
 	{
-		Tags { "RenderType"="Opaque" }
+		Tags { "RenderType"="Opaque" "DisableBatching" = "True" }
 
 		Pass
 		{
 			Tags { "LightMode" = "SRP0301_Pass" }
 
-			CGPROGRAM
+			HLSLPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma multi_compile_instancing
-
-			#include "UnityCG.cginc"
+			#include "../_General/ShaderLibrary/Input/Transformation.hlsl"
+			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/UnityInstancing.hlsl"
 
 			struct appdata
 			{
@@ -53,7 +53,7 @@
 			float4 _MainTex_ST;
 
 			//D3D 64KB * 500 Objects OPENGL 16KB * 125 Objects
-			UNITY_INSTANCING_BUFFER_START(Props)
+			UNITY_INSTANCING_BUFFER_START(MyProps)
 				UNITY_DEFINE_INSTANCED_PROP(float4, _Color1)
 				UNITY_DEFINE_INSTANCED_PROP(float4, _Color2)
 				UNITY_DEFINE_INSTANCED_PROP(float4, _Color3)
@@ -70,7 +70,7 @@
 				UNITY_DEFINE_INSTANCED_PROP(float4, _Color14)
 				UNITY_DEFINE_INSTANCED_PROP(float4, _Color15)
 				UNITY_DEFINE_INSTANCED_PROP(float4, _Color16) //16 bytes * 16 colors = 256 bytes
-			UNITY_INSTANCING_BUFFER_END(Props)
+			UNITY_INSTANCING_BUFFER_END(MyProps)
 			
 			v2f vert (appdata v)
 			{
@@ -79,37 +79,42 @@
 				UNITY_SETUP_INSTANCE_ID(v);
                 UNITY_TRANSFER_INSTANCE_ID(v, o);
 
-				o.vertex = UnityObjectToClipPos(v.vertex);
+				o.vertex = TransformObjectToHClip(v.vertex.xyz);
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 				return o;
 			}
 			
-			fixed4 frag (v2f i) : SV_Target
+			float4 frag (v2f i) : SV_Target
 			{
 				UNITY_SETUP_INSTANCE_ID(i);
 
-				fixed4 col = tex2D( _MainTex, i.uv );
+				float4 col = tex2D(_MainTex, i.uv);
 
-				fixed4 color = UNITY_ACCESS_INSTANCED_PROP(Props, _Color1);
-				color += UNITY_ACCESS_INSTANCED_PROP(Props, _Color2);
-				color += UNITY_ACCESS_INSTANCED_PROP(Props, _Color3);
-				color += UNITY_ACCESS_INSTANCED_PROP(Props, _Color4);
-				color += UNITY_ACCESS_INSTANCED_PROP(Props, _Color5);
-				color += UNITY_ACCESS_INSTANCED_PROP(Props, _Color6);
-				color += UNITY_ACCESS_INSTANCED_PROP(Props, _Color7);
-				color += UNITY_ACCESS_INSTANCED_PROP(Props, _Color8);
-				color += UNITY_ACCESS_INSTANCED_PROP(Props, _Color9);
-				color += UNITY_ACCESS_INSTANCED_PROP(Props, _Color10);
-				color += UNITY_ACCESS_INSTANCED_PROP(Props, _Color11);
-				color += UNITY_ACCESS_INSTANCED_PROP(Props, _Color12);
-				color += UNITY_ACCESS_INSTANCED_PROP(Props, _Color13);
-				color += UNITY_ACCESS_INSTANCED_PROP(Props, _Color14);
-				color += UNITY_ACCESS_INSTANCED_PROP(Props, _Color15);
-				color += UNITY_ACCESS_INSTANCED_PROP(Props, _Color16);
+				float4 color = 0;
 				
-				return col * color;
+				color += UNITY_ACCESS_INSTANCED_PROP(MyProps, _Color1);
+				color += UNITY_ACCESS_INSTANCED_PROP(MyProps, _Color2);
+				color += UNITY_ACCESS_INSTANCED_PROP(MyProps, _Color3);
+				color += UNITY_ACCESS_INSTANCED_PROP(MyProps, _Color4);
+				color += UNITY_ACCESS_INSTANCED_PROP(MyProps, _Color5);
+				color += UNITY_ACCESS_INSTANCED_PROP(MyProps, _Color6);
+				color += UNITY_ACCESS_INSTANCED_PROP(MyProps, _Color7);
+				color += UNITY_ACCESS_INSTANCED_PROP(MyProps, _Color8);
+				color += UNITY_ACCESS_INSTANCED_PROP(MyProps, _Color9);
+				color += UNITY_ACCESS_INSTANCED_PROP(MyProps, _Color10);
+				color += UNITY_ACCESS_INSTANCED_PROP(MyProps, _Color11);
+				color += UNITY_ACCESS_INSTANCED_PROP(MyProps, _Color12);
+				color += UNITY_ACCESS_INSTANCED_PROP(MyProps, _Color13);
+				color += UNITY_ACCESS_INSTANCED_PROP(MyProps, _Color14);
+				color += UNITY_ACCESS_INSTANCED_PROP(MyProps, _Color15);
+				color += UNITY_ACCESS_INSTANCED_PROP(MyProps, _Color16);
+
+				col *= color;
+				col = saturate(col);
+				
+				return col;
 			}
-			ENDCG
+			ENDHLSL
 		}
 	}
 }

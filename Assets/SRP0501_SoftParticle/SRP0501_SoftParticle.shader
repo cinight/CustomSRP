@@ -23,7 +23,6 @@
             #pragma vertex vert
             #pragma fragment frag
             #pragma target 2.0
-            //#pragma multi_compile __ _FLIPUV
             #include "../_General/ShaderLibrary/Input/Transformation.hlsl"
 
 
@@ -71,10 +70,6 @@
 
                     float2 uv = i.projPos.xy/ i.projPos.z;
 
-                    //#if defined(UNITY_UV_STARTS_AT_TOP) && !defined(_FLIPUV)
-                    //    uv.y = 1- uv.y;
-                    //#endif
-
                     float sceneZ = LinearEyeDepth (tex2D(_CameraDepthTexture, uv).r,_ZBufferParams);
                     float partZ = i.projPos.z;
                     float fZ = (sceneZ-partZ);
@@ -83,9 +78,6 @@
 
                     float edgearound = pow( abs(fade *_EdgeAroundColor.a), _EdgeAroundPower);
                     col.rgb = lerp( _EdgeAroundColor.rgb, col.rgb, edgearound);
-
-                    //float depth = tex2D(_CameraDepthTexture, i.texcoord).r * 10;
-                    //float4 c = float4(depth, 0 ,0,1);
 
                 return col*0.8f;
             }
