@@ -30,6 +30,8 @@ public class SRP1002Instance : RenderPipeline
 
     private int depthBufferBits = 24;
 
+    private string debugTag = "";
+
     public SRP1002Instance()
     {
     }
@@ -69,69 +71,114 @@ public class SRP1002Instance : RenderPipeline
             DrawingSettings drawSettings = new DrawingSettings(m_PassName, sortingSettings);
             FilteringSettings filterSettings = new FilteringSettings(RenderQueueRange.all);
 
-            //SetUp CommandBuffer
-            CommandBuffer cmd = new CommandBuffer();
-            cmd.name = "("+camera.name+")"+ "Rendering";
-
-            //Set Temp RT & set render target to the RT
-            //CommandBuffer cmdTempId = new CommandBuffer();
-            //cmdTempId.name = "("+camera.name+")"+ "Setup TempRT";
-            cmd.Clear();
-            cmd.BeginSample("GetTemporaryRT");
-                cmd.GetTemporaryRT(m_ColorRTid, colorRTDesc,FilterMode.Bilinear);
-            cmd.EndSample("GetTemporaryRT");
-            cmd.BeginSample("SetRenderTarget");
-                cmd.SetRenderTarget(m_ColorRT);
-            cmd.EndSample("SetRenderTarget");
-            context.ExecuteCommandBuffer(cmd);
-            //cmdTempId.Release();
+            //cmd.BeginSample("xxx");
+            //cmd.EndSample("xxx");
+            //UnityEngine.Profiling.Profiler.BeginSample("xxx");
+            //UnityEngine.Profiling.Profiler.EndSample();
 
             //Camera clear flag
-            //CommandBuffer cmd = new CommandBuffer();
-            //cmd.name = "("+camera.name+")"+ "Clear Flag";
-            cmd.Clear();
-            cmd.BeginSample("ClearRenderTarget");
-                cmd.ClearRenderTarget(clearDepth, clearColor, camera.backgroundColor);
-            cmd.EndSample("ClearRenderTarget");
-            context.ExecuteCommandBuffer(cmd);
-            //cmd.Release();
+            {
+                debugTag = "Debug - ClearRenderTarget";
+                CommandBuffer cmd = CommandBufferPool.Get(debugTag);
+                using (new ProfilingSample(cmd, debugTag))
+                {
+                    context.ExecuteCommandBuffer(cmd);
+                    cmd.Clear();
+                    //
+                    cmd.GetTemporaryRT(m_ColorRTid, colorRTDesc,FilterMode.Bilinear);
+                    cmd.SetRenderTarget(m_ColorRT);
+                    cmd.ClearRenderTarget(clearDepth, clearColor, camera.backgroundColor);
+                    //
+                }
+                context.ExecuteCommandBuffer(cmd);
+                CommandBufferPool.Release(cmd);
+            }
 
-            //Skybox
-            if(drawSkyBox)  {  context.DrawSkybox(camera);  }
+            // Skybox
+            {
+                debugTag = "Debug - DrawSkyBox";
+                CommandBuffer cmd = CommandBufferPool.Get(debugTag);
+                using (new ProfilingSample(cmd, debugTag))
+                {
+                    context.ExecuteCommandBuffer(cmd);
+                    cmd.Clear();
+                    //
+                    if(drawSkyBox)  {  context.DrawSkybox(camera);  }
+                    //
+                }
+                context.ExecuteCommandBuffer(cmd);
+                CommandBufferPool.Release(cmd);
+            }
 
             //Opaque objects
-            sortingSettings.criteria = SortingCriteria.CommonOpaque;
-            drawSettings.sortingSettings = sortingSettings;
-            filterSettings.renderQueueRange = RenderQueueRange.opaque;
-            context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
+            {
+                debugTag = "Debug - DrawOpaqueObjects";
+                CommandBuffer cmd = CommandBufferPool.Get(debugTag);
+                using (new ProfilingSample(cmd, debugTag))
+                {
+                    context.ExecuteCommandBuffer(cmd);
+                    cmd.Clear();
+                    //
+                    sortingSettings.criteria = SortingCriteria.CommonOpaque;
+                    drawSettings.sortingSettings = sortingSettings;
+                    filterSettings.renderQueueRange = RenderQueueRange.opaque;
+                    context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
+                    //
+                }
+                context.ExecuteCommandBuffer(cmd);
+                CommandBufferPool.Release(cmd);
+            }
 
             //Transparent objects
-            sortingSettings.criteria = SortingCriteria.CommonTransparent;
-            drawSettings.sortingSettings = sortingSettings;
-            filterSettings.renderQueueRange = RenderQueueRange.transparent;
-            context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
+            {
+                debugTag = "Debug - DrawTransparentObjects";
+                CommandBuffer cmd = CommandBufferPool.Get(debugTag);
+                using (new ProfilingSample(cmd, debugTag))
+                {
+                    context.ExecuteCommandBuffer(cmd);
+                    cmd.Clear();
+                    //
+                    sortingSettings.criteria = SortingCriteria.CommonTransparent;
+                    drawSettings.sortingSettings = sortingSettings;
+                    filterSettings.renderQueueRange = RenderQueueRange.transparent;
+                    context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
+                    //
+                }
+                context.ExecuteCommandBuffer(cmd);
+                CommandBufferPool.Release(cmd);
+            }
 
             //Blit to screen
-            //CommandBuffer cmdBlitToScreen = new CommandBuffer();
-            //cmdBlitToScreen.name = "("+camera.name+")"+ "Blit to Screen";
-            cmd.Clear();
-            cmd.BeginSample("Blit");
-                cmd.Blit(m_ColorRT,BuiltinRenderTextureType.CameraTarget);
-            cmd.EndSample("Blit");
-            context.ExecuteCommandBuffer(cmd);
-            //cmd.Release();
+            {
+                debugTag = "Debug - BlitToScreen";
+                CommandBuffer cmd = CommandBufferPool.Get(debugTag);
+                using (new ProfilingSample(cmd, debugTag))
+                {
+                    context.ExecuteCommandBuffer(cmd);
+                    cmd.Clear();
+                    //
+                    cmd.Blit(m_ColorRT,BuiltinRenderTextureType.CameraTarget);
+                    //
+                }
+                context.ExecuteCommandBuffer(cmd);
+                CommandBufferPool.Release(cmd);
+            }
 
             //Clean Up
-            //CommandBuffer cmdclean = new CommandBuffer();
-            //cmdclean.name = "("+camera.name+")"+ "Clean Up";
-            cmd.Clear();
-            cmd.BeginSample("ReleaseTemporaryRT");
-                cmd.ReleaseTemporaryRT(m_ColorRTid);
-            cmd.EndSample("ReleaseTemporaryRT");
-            context.ExecuteCommandBuffer(cmd);
-
-            //Finish commandBuffer
-            cmd.Release();
+            {
+                debugTag = "Debug - CleanUp";
+                CommandBuffer cmd = CommandBufferPool.Get(debugTag);
+                using (new ProfilingSample(cmd, debugTag))
+                {
+                    context.ExecuteCommandBuffer(cmd);
+                    cmd.Clear();
+                    //
+                    cmd.ReleaseTemporaryRT(m_ColorRTid);
+                    //
+                }
+                context.ExecuteCommandBuffer(cmd);
+                CommandBufferPool.Release(cmd);
+            }
 
             context.Submit();
         }
