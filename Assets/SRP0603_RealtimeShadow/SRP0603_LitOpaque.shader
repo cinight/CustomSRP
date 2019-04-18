@@ -1,4 +1,4 @@
-﻿Shader "CustomSRP/SRP0601/UnlitOpaque"
+﻿Shader "CustomSRP/SRP0603/LitOpaque"
 {
 	Properties
 	{
@@ -11,12 +11,12 @@
 
 		Pass
 		{
-			Tags { "LightMode" = "SRP0601_Pass" }
+			Tags { "LightMode" = "SRP0603_Pass" }
 
 			HLSLPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-			#include "SRP0601_RealtimeLights.hlsl"
+			#include "SRP0603_RealtimeLights.hlsl"
 			#include "../_General/ShaderLibrary/Input/Transformation.hlsl"
 
 			struct appdata
@@ -32,6 +32,8 @@
 				float3 normalWS : NORMAL;
 				float3 positionWS : TEXCOORD1;
 				float4 vertex : SV_POSITION;
+
+				float4 _ShadowCoord : TEXCOORD2;
 			};
 
 			// Declaring our per-material properties in a constant buffer will allow the new SRP batcher to function.
@@ -49,6 +51,8 @@
 				float4 _LightDataArray[MAXLIGHTCOUNT];
 				float4 _LightSpotDirArray[MAXLIGHTCOUNT];
 			CBUFFER_END
+
+			sampler2D _ShadowMapTexture;
 			
 			v2f vert (appdata v)
 			{
@@ -60,6 +64,7 @@
 				o.positionWS = positionWS;
 				o.normalWS = TransformObjectToWorldNormal(v.normalOS);
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+				o._ShadowCoord = ComputeScreenPos(o.vertex);
 				return o;
 			}
 			
@@ -96,10 +101,62 @@
 					int i = unity_LightIndices[1][id2-4];
 					albedo = CalculateLight(IN, i,albedo);
 				}
+
+				//Shadow
+				float attenuation = tex2Dproj(_ShadowMapTexture, IN._ShadowCoord).r;
+				albedo.rgb *= attenuation;
 				
 				return albedo;
 			}
 			ENDHLSL
 		}
+		//=======================================================================
+        Pass
+     	{
+			Name "ShadowCaster"
+			Tags{ "LightMode" = "ShadowCaster" }
+
+         	HLSLPROGRAM
+ 			#pragma vertex vert
+			#pragma fragment frag
+			#pragma multi_compile_shadowcaster
+			#pragma fragmentoption ARB_precision_hint_fastest
+ 
+			#include "UnityCG.cginc"
+ 
+			struct v2f
+			{
+				float4 pos : SV_POSITION;
+			};
+ 
+			v2f vert(appdata_base v)
+			{
+				v2f o;
+
+				float4 wPos = mul(unity_ObjectToWorld, v.vertex);
+				float3 wNormal = normalize(mul(v.normal, (float3x3)unity_WorldToObject));
+
+					float3 wLight = normalize(_WorldSpaceLightPos0.xyz);
+
+					float shadowCos = dot(wNormal, wLight);
+					float shadowSine = sqrt(1-shadowCos*shadowCos);
+					//float normalBias = unity_LightShadowBias.z * shadowSine;
+					float normalBias = 0.01f * shadowSine;
+
+					wPos.xyz -= wNormal * normalBias;
+
+				o.pos = mul(UNITY_MATRIX_VP, wPos);
+				o.pos = UnityApplyLinearShadowBias(o.pos);
+
+				return o;
+			}
+ 
+			float4 frag(v2f i) : COLOR
+			{
+				return 0;
+			}
+ 
+         	ENDHLSL
+    	}
 	}
 }
