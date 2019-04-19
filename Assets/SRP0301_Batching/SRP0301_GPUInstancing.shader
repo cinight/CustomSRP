@@ -32,8 +32,13 @@
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma multi_compile_instancing
-			#include "../_General/ShaderLibrary/Input/Transformation.hlsl"
-			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/UnityInstancing.hlsl"
+			
+			//The order has to be like this...
+			#include "../_General/ShaderLibrary/Input/InputMacro.hlsl"
+			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
+			#include "../_General/ShaderLibrary/Input/UnityBuiltIn.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/UnityInstancing.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/SpaceTransforms.hlsl"
 
 			struct appdata
 			{
