@@ -114,6 +114,8 @@ public class SRP0602Instance : RenderPipeline
                                 PerObjectData.ReflectionProbes
             };
             FilteringSettings filterSettings = new FilteringSettings(RenderQueueRange.all);
+            GraphicsSettings.useScriptableRenderPipelineBatching = false; 
+            // ^if it's true it breaks the baked data
 
             //Skybox
             if(drawSkyBox)  {  context.DrawSkybox(camera);  }
