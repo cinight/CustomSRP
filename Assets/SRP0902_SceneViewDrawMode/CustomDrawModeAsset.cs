@@ -31,8 +31,9 @@ public class CustomDrawModeAsset : ScriptableObject
 	#endif
 }
 
-
-[InitializeOnLoad]
+#if UNITY_EDITOR
+	[InitializeOnLoad]
+#endif
 public static class CustomDrawModeAssetObject
 {
 	public static CustomDrawModeAsset cdma;
