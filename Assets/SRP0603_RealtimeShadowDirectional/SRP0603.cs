@@ -191,11 +191,6 @@ public class SRP0603Instance : RenderPipeline
         //************************** Shadow Mapping ************************************
         if (doShadow)
         {
-            //Draw Shadow
-            // DrawingSettings drawShadowSettings = new DrawShadowsSettings(cull, i);
-            // drawShadowSettings.splitData.cullingSphere = splitData.cullingSphere;
-            // context.DrawShadows(ref drawShadowSettings);
-
             ShadowDrawingSettings shadowSettings = new ShadowDrawingSettings(cull, lightIndex);
 
             //For shadowmapping, the matrices from the light's point of view
@@ -208,31 +203,13 @@ public class SRP0603Instance : RenderPipeline
             {
                 successShadowMap = cull.ComputeDirectionalShadowMatricesAndCullingPrimitives
                 (
-                        lightIndex,
-                        0, 1, new Vector3(1,0,0),
-                        m_ShadowRes, light.shadowNearPlane, out view, out proj, out splitData
-                );
-                shadowSettings.splitData = splitData;
-            }
-            else if (light.type == LightType.Spot)
-            {
-                successShadowMap = cull.ComputeSpotShadowMatricesAndCullingPrimitives
-                (
-                        lightIndex, out view, out proj, out splitData
-                );
-                shadowSettings.splitData = splitData;
-            }
-            else if (light.type == LightType.Point)
-            {
-                successShadowMap = cull.ComputePointShadowMatricesAndCullingPrimitives
-                (
-                        lightIndex, CubemapFace.Unknown, 0.1f, out view, out proj, out splitData
+                    lightIndex,
+                    0, 1, new Vector3(1,0,0),
+                    m_ShadowRes, light.shadowNearPlane, out view, out proj, out splitData
                 );
                 shadowSettings.splitData = splitData;
             }
             else return;
-
-            //Debug.Log(light.type + " "+successShadowMap);
 
             if(successShadowMap)
             {
@@ -319,10 +296,7 @@ public class SRP0603Instance : RenderPipeline
                 lightColor[i] = light.finalColor;
                 lightColor[i].w = -1; //for identifying it is a directional light in shader
 
-                //setup shadow
-                // shadow = ConfigureShadows(i, light.light);
-                // shadow.z = 1f;
-                SetUpRealtimeShadowVariables(cam, context, cull, light.light, i);
+                SetUpRealtimeShadowVariables(cam, context, cull, light.light, i); //setup shadow
                 
             }
             else if (light.lightType == LightType.Point)
@@ -331,8 +305,6 @@ public class SRP0603Instance : RenderPipeline
                 lightData[i].w = light.range;
                 lightColor[i] = light.finalColor;
                 lightColor[i].w = -2; //for identifying it is a point light in shader
-
-                SetUpRealtimeShadowVariables(cam, context, cull, light.light, i);
             }
             else if (light.lightType == LightType.Spot)
             {
@@ -354,11 +326,6 @@ public class SRP0603Instance : RenderPipeline
                 //Spotlight attenuation
                 lightSpotDir[i].w = 1f / angleRange;
 				lightColor[i].w = -outerCos * lightSpotDir[i].w;
-
-                // //setup shadow
-                // shadow = ConfigureShadows(i, light.light);
-
-                SetUpRealtimeShadowVariables(cam, context, cull, light.light, i);
             }
             else
             {

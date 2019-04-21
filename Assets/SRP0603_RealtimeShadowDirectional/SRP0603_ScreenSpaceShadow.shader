@@ -2,8 +2,6 @@
 {
     SubShader
     {
-        //Tags{ "RenderPipeline" = "ForwardBase" "IgnoreProjector" = "True"}
-
         Pass
         {
             Name "ScreenSpaceShadows"
@@ -89,15 +87,16 @@
                 //World
                 float3 wpos = mul(unity_CameraToWorld, float4(vpos, 1)).xyz;
 
-                //Fetch shadow coordinates for cascade.
-                //float4 coords  = mul(wts, float4(wpos, 1.0));
+                //Fetch shadow coordinates
                 float4 coords  = mul(_WorldToShadow, float4(wpos, 1.0));
 
+                //To see if pixel is in shadow
                 coords.xyz /= coords.w;
                 float attenuation = _ShadowMap.SampleCmpLevelZero(sampler_ShadowMap, coords.xy, coords.z);
                 float oneMinusT = 1.0 - _ShadowStrength;
                 attenuation = oneMinusT + attenuation * _ShadowStrength;
 
+                //blend result
                 float4 final = tex2D(_ShadowMapTexture,i.uv);
                 final.rgb *= attenuation;
 

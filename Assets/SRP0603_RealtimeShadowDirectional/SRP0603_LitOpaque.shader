@@ -16,7 +16,7 @@
 			HLSLPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-			#include "SRP0603_RealtimeLights.hlsl"
+			#include "../SRP0601_RealtimeLights/SRP0601_RealtimeLights.hlsl" //reuse the lighting calculation
 			#include "../_General/ShaderLibrary/Input/Transformation.hlsl"
 
 			struct appdata
@@ -119,8 +119,6 @@
          	HLSLPROGRAM
  			#pragma vertex vert
 			#pragma fragment frag
-			//#pragma multi_compile_shadowcaster
-			//#pragma fragmentoption ARB_precision_hint_fastest
  
 			#include "../_General/ShaderLibrary/Input/Transformation.hlsl"
  
@@ -139,25 +137,8 @@
 				v2f o;
 
 				float4 wPos = mul(unity_ObjectToWorld, float4(v.vertex.xyz,1));
-				//float3 wNormal = normalize(mul(v.normal, (float3x3)unity_WorldToObject));
-
-					//float3 wLight = normalize(_WorldSpaceLightPos0.xyz);
-
-					//float shadowCos = dot(wNormal, wLight);
-					//float shadowSine = sqrt(1-shadowCos*shadowCos);
-					//float normalBias = unity_LightShadowBias.z * shadowSine;
-					//float normalBias = 0.01f * shadowSine;
-
-					//wPos.xyz -= wNormal * normalBias;
-
 				o.pos = mul(UNITY_MATRIX_VP, wPos);
 				//o.pos = UnityApplyLinearShadowBias(o.pos);
-
-				#if UNITY_REVERSED_Z
-					o.pos.z = min(o.pos.z, o.pos.w * UNITY_NEAR_CLIP_VALUE);
-				#else
-					o.pos.z = max(o.pos.z, o.pos.w * UNITY_NEAR_CLIP_VALUE);
-				#endif
 
 				return o;
 			}
