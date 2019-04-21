@@ -30,9 +30,6 @@ EditorBuildSettings:
     path: Assets/SRP0301_Batching/SRP0301_Batching.unity
     guid: fb75decb166a6b24ebba64fb6187eb31
   - enabled: 1
-    path: Assets/SRP0601_RealtimeLights/SRP0601_RealtimeLights.unity
-    guid: f282cc42fb1c7194d872833eabcf55c6
-  - enabled: 1
     path: Assets/SRP0401_NoSpecificPass/SRP0401_NoSpecificPass.unity
     guid: 966491527f2baa447a0544f89eb37a48
   - enabled: 1
@@ -53,6 +50,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/SRP0502_Distortion/SRP0502_Distortion.unity
     guid: 1815eabba3eaa6b49bae06a2520b2b63
+  - enabled: 1
+    path: Assets/SRP0601_RealtimeLights/SRP0601_RealtimeLights.unity
+    guid: f282cc42fb1c7194d872833eabcf55c6
+  - enabled: 1
+    path: Assets/SRP0602_BakedLights/SRP0602_BakedLights.unity
+    guid: f74ece76f2fa10b4eb275c6355476c34
+  - enabled: 1
+    path: Assets/SRP0603_RealtimeShadowDirectional/SRP0603_RealtimeShadowDirectional.unity
+    guid: 3d6a8fa59d86a4d42bb3b8d6e191dc65
   - enabled: 1
     path: Assets/SRP0701_HDR_MSAA/SRP0701_HDR_MSAA.unity
     guid: f45d7d050c77835498ef30aa0fcbfb0c
@@ -86,4 +92,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/SRP1002_Debug/SRP1002_Debug.unity
     guid: f0306b4c8e88f1141a1958430f6945d0
+  - enabled: 1
+    path: Assets/SRP1003_DefaultShaders/SRP1003_DefaultShaders.unity
+    guid: a528bfc08fcb70b49bf234680e6636f2
   m_configObjects: {}

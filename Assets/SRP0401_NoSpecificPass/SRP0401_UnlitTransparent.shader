@@ -13,7 +13,7 @@
 
 		Pass
 		{
-			Tags { "LightMode" = "SRP0401_Pass" }
+			//Tags { "LightMode" = "SRP0401_Pass" }
 
 			HLSLPROGRAM
 			#pragma vertex vert
