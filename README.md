@@ -1,7 +1,7 @@
 # CustomSRP
 A new SRP from scratch
 
-Unity version : 2019.1.0f1
+Unity version : 2019.1.0f1 \
 Tested with : Win DX11, Mac Metal
 
 | Scene | Image | Description |
