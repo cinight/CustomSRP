@@ -95,11 +95,11 @@ public class SRP0703Instance : RenderPipeline
 
     protected override void Render(ScriptableRenderContext context, Camera[] cameras)
     {
-        BeginFrameRendering(cameras);
+        BeginFrameRendering(context,cameras);
 
         foreach (Camera camera in cameras)
         {
-            BeginCameraRendering(camera);
+            BeginCameraRendering(context,camera);
 
             //Culling
             ScriptableCullingParameters cullingParams;
