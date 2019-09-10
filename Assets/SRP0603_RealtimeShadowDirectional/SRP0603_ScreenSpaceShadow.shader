@@ -27,7 +27,7 @@
             float _ShadowStrength;
 
             //I want to blend together
-            sampler2D _ShadowMapTexture;
+            //sampler2D _ShadowMapTexture;
 
             struct VertexInput
             {
@@ -64,7 +64,7 @@
 
             half4 Fragment(v2f i) : SV_Target
             {
-                float deviceDepth = _CameraDepthTexture.Sample(sampler_CameraDepthTexture, i.texcoord.xy);
+                float deviceDepth = _CameraDepthTexture.Sample(sampler_CameraDepthTexture, i.texcoord.xy).r;
 
                 #if UNITY_REVERSED_Z
                     deviceDepth = 1 - deviceDepth;
@@ -97,8 +97,9 @@
                 attenuation = oneMinusT + attenuation * _ShadowStrength;
 
                 //blend result
-                float4 final = tex2D(_ShadowMapTexture,i.uv);
-                final.rgb *= attenuation;
+                //float4 final = tex2D(_ShadowMapTexture,i.uv);
+                float4 final = 1;
+                final.rgb = attenuation;
 
                 return final;
             }
