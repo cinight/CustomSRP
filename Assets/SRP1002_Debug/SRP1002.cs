@@ -181,6 +181,10 @@ public class SRP1002Instance : RenderPipeline
             }
 
             context.Submit();
+            
+            EndCameraRendering(context,camera);
         }
+
+        EndFrameRendering(context,cameras);
     }
 }

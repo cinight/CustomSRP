@@ -102,7 +102,11 @@ namespace SRP0404
                     argsBuffer.Release();
                     argsBuffer = null;
                 }
+
+                EndCameraRendering(context,camera);
             }
+
+            EndFrameRendering(context,cameras);
         }
     }
 }

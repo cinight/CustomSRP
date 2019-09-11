@@ -88,6 +88,10 @@ public class SRP0401Instance : RenderPipeline
             context.DrawRenderers(cull, ref drawSettingsDefault, ref filterSettings);
 
             context.Submit();
+            
+            EndCameraRendering(context,camera);
         }
+
+        EndFrameRendering(context,cameras);
     }
 }

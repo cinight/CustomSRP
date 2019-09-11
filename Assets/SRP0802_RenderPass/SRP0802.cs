@@ -162,6 +162,10 @@ public class SRP0802Instance : RenderPipeline
             renderPassAttachments.Dispose();
             renderPassColorAttachments.Dispose();
             renderPassOutputAttachments.Dispose();
+            
+            EndCameraRendering(context,camera);
         }
+
+        EndFrameRendering(context,cameras);
     }
 }

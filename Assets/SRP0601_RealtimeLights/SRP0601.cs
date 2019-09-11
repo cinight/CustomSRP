@@ -93,7 +93,11 @@ public class SRP0601Instance : RenderPipeline
             context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
 
             context.Submit();
+            
+            EndCameraRendering(context,camera);
         }
+
+        EndFrameRendering(context,cameras);
     }
 
     private void SetUpRealtimeLightingVariables(ScriptableRenderContext context, CullingResults cull)

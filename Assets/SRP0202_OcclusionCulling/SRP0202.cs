@@ -91,6 +91,10 @@ public class SRP0202Instance : RenderPipeline
             #endif
 
             context.Submit();
+            
+            EndCameraRendering(context,camera);
         }
+
+        EndFrameRendering(context,cameras);
     }
 }

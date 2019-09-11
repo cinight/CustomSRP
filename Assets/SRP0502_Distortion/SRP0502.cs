@@ -122,6 +122,10 @@ public class SRP0502Instance : RenderPipeline
             cmdclean.Release();
 
             context.Submit();
+            
+            EndCameraRendering(context,camera);
         }
+
+        EndFrameRendering(context,cameras);
     }
 }

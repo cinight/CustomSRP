@@ -109,7 +109,11 @@ public class SRP0201Instance : RenderPipeline
             #endif
 
             context.Submit();
+            
+            EndCameraRendering(context,camera);
         }
+
+        EndFrameRendering(context,cameras);
     }
 
     protected void ShowCullingResult(Camera camera, CullingResults cull)

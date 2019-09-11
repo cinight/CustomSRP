@@ -69,7 +69,11 @@ namespace SRP0102
                 }
 
                 context.Submit();
+                
+                EndCameraRendering(context,camera);
             }
+
+            EndFrameRendering(context,cameras);
         }
     }
 }

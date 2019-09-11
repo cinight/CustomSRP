@@ -120,6 +120,10 @@ public class SRP1001Instance : RenderPipeline
             DrawErrorShader(context,sortingSettings,cull,filterSettings);
 
             context.Submit();
+            
+            EndCameraRendering(context,camera);
         }
+
+        EndFrameRendering(context,cameras);
     }
 }

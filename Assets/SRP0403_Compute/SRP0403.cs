@@ -161,7 +161,11 @@ namespace SRP0403
                 cmdclean.Release();
 
                 context.Submit();
+                
+                EndCameraRendering(context,camera);
             }
+
+            EndFrameRendering(context,cameras);
         }
     }
 }

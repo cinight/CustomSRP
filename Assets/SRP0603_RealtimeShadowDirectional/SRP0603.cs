@@ -180,7 +180,11 @@ public class SRP0603Instance : RenderPipeline
             cmdclean.Release();
 
             context.Submit();
+            
+            EndCameraRendering(context,camera);
         }
+
+        EndFrameRendering(context,cameras);
     }
 
     private void SetUpRealtimeShadowVariables(Camera cam, ScriptableRenderContext context, CullingResults cull, Light light, int lightIndex)

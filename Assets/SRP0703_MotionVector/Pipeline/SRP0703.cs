@@ -346,6 +346,10 @@ public class SRP0703Instance : RenderPipeline
 
             //For camera motion vector
             _PreviousVP = _NonJitteredVP;
+
+            EndCameraRendering(context,camera);
         }
+
+        EndFrameRendering(context,cameras);
     }
 }
