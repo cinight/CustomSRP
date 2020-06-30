@@ -5,31 +5,39 @@ using UnityEngine.SceneManagement;
 
 public class UIControl : MonoBehaviour
 {
+    public float scale = 1f;
     public void Awake()
     {
         DontDestroyOnLoad(this.gameObject);
     }
 
-  void OnGUI()
+    public void Start()
     {
-        float scale = Screen.height / 1080f;
+        NextScene();
+    }
 
+    void OnGUI()
+    {
         GUI.skin.label.fontSize = Mathf.RoundToInt ( 16 * scale );
-        GUI.backgroundColor = new Color(0, 0, 0, .80f);
+        //GUI.backgroundColor = new Color(0, 0, 0, .80f);
         GUI.color = new Color(1, 1, 1, 1);
-        float w = 500 * scale, h = 90 * scale;
-        GUILayout.BeginArea(new Rect(Screen.width - w, Screen.height - h, w, h), GUI.skin.box);
+        float w = 410 * scale;
+        float h = 90 * scale;
+        GUILayout.BeginArea(new Rect(Screen.width - w -5, Screen.height - h -5, w, h), GUI.skin.box);
 
-        int currentpage = SceneManager.GetActiveScene().buildIndex +1;
-        GUILayout.Label( currentpage + " / " + SceneManager.sceneCountInBuildSettings + " " + SceneManager.GetActiveScene().name );
+        //GUI.backgroundColor = new Color(1, 1, 1, .80f);
+        GUIStyle customButton = new GUIStyle("button");
+        customButton.fontSize = GUI.skin.label.fontSize;
+        customButton.fixedHeight = 50 * scale;
 
         GUILayout.BeginHorizontal();
-        GUI.backgroundColor = new Color(1, 1, 1, .80f);
-        if(GUILayout.Button("\n Prev \n")) PrevScene();
-        if(GUILayout.Button("\n Next \n")) NextScene();
+        if(GUILayout.Button("Prev",customButton)) PrevScene();
+        if(GUILayout.Button("Next",customButton)) NextScene();
         GUILayout.EndHorizontal();
 
-
+        int currentpage = SceneManager.GetActiveScene().buildIndex;
+        int totalpages = SceneManager.sceneCountInBuildSettings-1;
+        GUILayout.Label( currentpage + " / " + totalpages + " " + SceneManager.GetActiveScene().name );
 
         GUILayout.EndArea();
     }
@@ -48,7 +56,7 @@ public class UIControl : MonoBehaviour
     {
         int sceneIndex = SceneManager.GetActiveScene().buildIndex;
 
-        if (sceneIndex > 0)
+        if (sceneIndex > 1)
             SceneManager.LoadScene(sceneIndex - 1);
         else
             SceneManager.LoadScene(SceneManager.sceneCountInBuildSettings - 1);

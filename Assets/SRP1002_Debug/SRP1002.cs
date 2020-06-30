@@ -30,10 +30,21 @@ public class SRP1002Instance : RenderPipeline
 
     private int depthBufferBits = 24;
 
-    private string debugTag = "";
+    private ProfilingSampler sampler_ClearRenderTarget;
+    private ProfilingSampler sampler_DrawSkyBox;
+    private ProfilingSampler sampler_DrawOpaqueObjects;
+    private ProfilingSampler sampler_DrawTransparentObjects;
+    private ProfilingSampler sampler_BlitToScreen;
+    private ProfilingSampler sampler_CleanUp;
 
     public SRP1002Instance()
     {
+        sampler_ClearRenderTarget = new ProfilingSampler ("Debug - ClearRenderTarget");
+        sampler_DrawSkyBox = new ProfilingSampler ("Debug - DrawSkyBox");
+        sampler_DrawOpaqueObjects = new ProfilingSampler ("Debug - DrawOpaqueObject");
+        sampler_DrawTransparentObjects = new ProfilingSampler ("Debug - DrawTransparentObjects");
+        sampler_BlitToScreen = new ProfilingSampler ("Debug - sampler_ClearRenderTarget");
+        sampler_CleanUp = new ProfilingSampler ("Debug - CleanUp");
     }
 
     protected override void Render(ScriptableRenderContext context, Camera[] cameras)
@@ -78,9 +89,8 @@ public class SRP1002Instance : RenderPipeline
 
             //Camera clear flag
             {
-                debugTag = "Debug - ClearRenderTarget";
-                CommandBuffer cmd = CommandBufferPool.Get(debugTag);
-                using (new ProfilingSample(cmd, debugTag))
+                CommandBuffer cmd = CommandBufferPool.Get(sampler_ClearRenderTarget.name);
+                using (new ProfilingScope(cmd, sampler_ClearRenderTarget))
                 {
                     context.ExecuteCommandBuffer(cmd);
                     cmd.Clear();
@@ -96,9 +106,8 @@ public class SRP1002Instance : RenderPipeline
 
             // Skybox
             {
-                debugTag = "Debug - DrawSkyBox";
-                CommandBuffer cmd = CommandBufferPool.Get(debugTag);
-                using (new ProfilingSample(cmd, debugTag))
+                CommandBuffer cmd = CommandBufferPool.Get(sampler_DrawSkyBox.name);
+                using (new ProfilingScope(cmd, sampler_DrawSkyBox))
                 {
                     context.ExecuteCommandBuffer(cmd);
                     cmd.Clear();
@@ -112,9 +121,8 @@ public class SRP1002Instance : RenderPipeline
 
             //Opaque objects
             {
-                debugTag = "Debug - DrawOpaqueObjects";
-                CommandBuffer cmd = CommandBufferPool.Get(debugTag);
-                using (new ProfilingSample(cmd, debugTag))
+                CommandBuffer cmd = CommandBufferPool.Get(sampler_DrawOpaqueObjects.name);
+                using (new ProfilingScope(cmd, sampler_DrawOpaqueObjects))
                 {
                     context.ExecuteCommandBuffer(cmd);
                     cmd.Clear();
@@ -131,9 +139,8 @@ public class SRP1002Instance : RenderPipeline
 
             //Transparent objects
             {
-                debugTag = "Debug - DrawTransparentObjects";
-                CommandBuffer cmd = CommandBufferPool.Get(debugTag);
-                using (new ProfilingSample(cmd, debugTag))
+                CommandBuffer cmd = CommandBufferPool.Get(sampler_DrawTransparentObjects.name);
+                using (new ProfilingScope(cmd, sampler_DrawTransparentObjects))
                 {
                     context.ExecuteCommandBuffer(cmd);
                     cmd.Clear();
@@ -150,9 +157,8 @@ public class SRP1002Instance : RenderPipeline
 
             //Blit to screen
             {
-                debugTag = "Debug - BlitToScreen";
-                CommandBuffer cmd = CommandBufferPool.Get(debugTag);
-                using (new ProfilingSample(cmd, debugTag))
+                CommandBuffer cmd = CommandBufferPool.Get(sampler_BlitToScreen.name);
+                using (new ProfilingScope(cmd, sampler_BlitToScreen))
                 {
                     context.ExecuteCommandBuffer(cmd);
                     cmd.Clear();
@@ -166,9 +172,8 @@ public class SRP1002Instance : RenderPipeline
 
             //Clean Up
             {
-                debugTag = "Debug - CleanUp";
-                CommandBuffer cmd = CommandBufferPool.Get(debugTag);
-                using (new ProfilingSample(cmd, debugTag))
+                CommandBuffer cmd = CommandBufferPool.Get(sampler_CleanUp.name);
+                using (new ProfilingScope(cmd, sampler_CleanUp))
                 {
                     context.ExecuteCommandBuffer(cmd);
                     cmd.Clear();
