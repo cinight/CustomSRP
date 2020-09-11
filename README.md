@@ -2,7 +2,7 @@
 A new SRP from scratch
 
 Unity version : 2019.3 on master branch \
-There is also 2019.1 and 2019.2 branch if you need
+Checkout to branches for 2019.1, 2019.2 and 2020.1
 
 Tested with : Win DX11, Mac Metal
 
