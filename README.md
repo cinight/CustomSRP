@@ -39,9 +39,9 @@ Tested with : Win DX11, Mac Metal
 | `SRP1003_DefaultShaders` | ![](READMEImages/SRP1003_DefaultShaders.gif) | Set pipeline default materials when creating new material / objects / particle / terrain etc |
 
 -------------
-References: \
-[My messy custom SRP study for Unity2018.3](https://cmwdexint.com/2018/05/24/custom-srp/) \
-[SRPFromScratch by pbbastian](https://github.com/pbbastian/SRPFromScratch) \
-Siggraph 2018 SRP presentation by Matt Dean \
-[Custom Pipeline by Catlike Coding](https://catlikecoding.com/unity/tutorials/scriptable-render-pipeline/) \
-[LWRP & HDRP](https://github.com/Unity-Technologies/ScriptableRenderPipeline)
+References / Useful Links:
+- [Custom SRP template by phi-lira](https://github.com/phi-lira/CustomSRP)
+- [Custom Pipeline by Catlike Coding](https://catlikecoding.com/unity/tutorials/scriptable-render-pipeline/)
+- [URP & HDRP](https://github.com/Unity-Technologies/Graphics)
+- [SRPFromScratch by pbbastian](https://github.com/pbbastian/SRPFromScratch)
+- Siggraph 2018 SRP presentation by Matt Dean
