@@ -9,6 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9544bc7e802904d4faa4f937b9526f34, type: 3}
-  m_Name: SRP0802_Asset
+  m_Script: {fileID: 11500000, guid: a5ce7b3756d007d4d884b1ba9be46a41, type: 3}
+  m_Name: SRP0802_RenderGraphAsset
   m_EditorClassIdentifier: 
