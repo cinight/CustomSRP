@@ -29,8 +29,8 @@ public partial class SRP0802_RenderGraph
         colorRTDesc.depthBufferBits = 0;
         colorRTDesc.msaaSamples = MSAASamples.None;
         colorRTDesc.enableRandomWrite = false;
-        //colorRTDesc.clearBuffer = true;
-        //colorRTDesc.clearColor = Color.black;
+        colorRTDesc.clearBuffer = true;
+        colorRTDesc.clearColor = Color.black;
         colorRTDesc.name = "Albedo";
 
         //Create texture
@@ -49,8 +49,8 @@ public partial class SRP0802_RenderGraph
         colorRTDesc.depthBufferBits = 0;
         colorRTDesc.msaaSamples = MSAASamples.None;
         colorRTDesc.enableRandomWrite = false;
-        //colorRTDesc.clearBuffer = true;
-        //colorRTDesc.clearColor = Color.black;
+        colorRTDesc.clearBuffer = true;
+        colorRTDesc.clearColor = Color.black;
         colorRTDesc.name = "Emission";
 
         //Create texture
@@ -69,8 +69,8 @@ public partial class SRP0802_RenderGraph
         colorRTDesc.depthBufferBits = DepthBits.Depth24;
         colorRTDesc.msaaSamples = MSAASamples.None;
         colorRTDesc.enableRandomWrite = false;
-        //colorRTDesc.clearBuffer = true;
-        //colorRTDesc.clearColor = Color.black;
+        colorRTDesc.clearBuffer = true;
+        colorRTDesc.clearColor = Color.black;
         colorRTDesc.name = "Depth";
 
         //Create texture

@@ -8,19 +8,18 @@ using UnityEngine.Experimental.Rendering;
 // PIPELINE ADD PASS --------------------------------------------------------------------------------------------
 public partial class SRP0802_RenderGraph
 {
-    ShaderTagId m_PassName2 = new ShaderTagId("SRP0802_Pass2"); //The shader pass tag just for SRP0802
+    Material m_material;
 
     class SRP0802_AddPassData
     {
-        public RendererListHandle m_renderList_opaque;
-        public RendererListHandle m_renderList_transparent;
         public TextureHandle m_Albedo;
         public TextureHandle m_Emission;
-        public RendererListHandle m_renderList;
     }
 
     public void Render_SRP0802_AddPass(Camera camera, RenderGraph graph, CullingResults cull, TextureHandle albedo, TextureHandle emission)
     {
+        if(m_material == null) m_material = new Material(Shader.Find("Hidden/CustomSRP/SRP0803/copyColor"));
+
         using (var builder = graph.AddRenderPass<SRP0802_AddPassData>("Add Pass", out var passData, new ProfilingSampler("Add Pass Profiler" ) ) )
         {
             //Textures
@@ -29,26 +28,16 @@ public partial class SRP0802_RenderGraph
 
             //Bind output to BackBuffer = render to screen
             builder.WriteTexture(graph.ImportBackbuffer(BuiltinRenderTextureType.CameraTarget));
-            
-            //Renderes
-            RendererListDesc rendererDesc_add_Opaque = new RendererListDesc(m_PassName2,cull,camera);
-            rendererDesc_add_Opaque.sortingCriteria = SortingCriteria.CommonOpaque;
-            rendererDesc_add_Opaque.renderQueueRange = RenderQueueRange.opaque;
-            RendererListHandle rHandle_add_Opaque = graph.CreateRendererList(rendererDesc_add_Opaque);
-            passData.m_renderList_opaque = builder.UseRendererList(rHandle_add_Opaque);
-
-            RendererListDesc rendererDesc_add_Transparent = new RendererListDesc(m_PassName2,cull,camera);
-            rendererDesc_add_Transparent.sortingCriteria = SortingCriteria.CommonTransparent;
-            rendererDesc_add_Transparent.renderQueueRange = RenderQueueRange.transparent;
-            RendererListHandle rHandle_add_Transparent = graph.CreateRendererList(rendererDesc_add_Transparent);
-            passData.m_renderList_transparent = builder.UseRendererList(rHandle_add_Transparent);
 
             //Builder
             builder.SetRenderFunc((SRP0802_AddPassData data, RenderGraphContext context) => 
             {
+                MaterialPropertyBlock mpb = new MaterialPropertyBlock();
+                mpb.SetTexture("_CameraAlbedoTexture",data.m_Albedo);
+                mpb.SetTexture("_CameraEmissionTexture",data.m_Emission);
+
                 CoreUtils.SetRenderTarget( context.cmd, BuiltinRenderTextureType.CameraTarget );
-                CoreUtils.DrawRendererList( context.renderContext, context.cmd, data.m_renderList_opaque );
-                CoreUtils.DrawRendererList( context.renderContext, context.cmd, data.m_renderList_transparent );
+                CoreUtils.DrawFullScreen( context.cmd, m_material, mpb );
             });
         }
     }
