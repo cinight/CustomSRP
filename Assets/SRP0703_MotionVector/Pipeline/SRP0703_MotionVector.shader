@@ -115,7 +115,7 @@ Shader "Hidden/CustomSRP/SRP0703/MotionVectors"
             #ifdef UNITY_HALF_TEXEL_OFFSET
                 o.pos.xy += (_ScreenParams.zw - 1.0) * float2(-1, 1) * o.pos.w;
             #endif
-            o.uv = ComputeScreenPos(o.pos);
+            o.uv = ComputeScreenPos(o.pos).xy;
             // we know we are rendering a quad,
             // and the normal passed from C++ is the raw ray.
             o.ray = v.normal;
@@ -151,7 +151,7 @@ Shader "Hidden/CustomSRP/SRP0703/MotionVectors"
 
         half4 FragMotionVectorsCamera(CamMotionVectors i) : SV_Target
         {
-            float depth = tex2D(_CameraDepthTexture, i.uv);
+            float depth = tex2D(_CameraDepthTexture, i.uv).r;
             //return float4(1,1,0,1);
             half2 motion = CalculateMotion(depth, i.uv, i.ray);
             return half4(motion, 0, min(motion.x+motion.y,1));
@@ -159,7 +159,7 @@ Shader "Hidden/CustomSRP/SRP0703/MotionVectors"
 
         half4 FragMotionVectorsCameraWithDepth(CamMotionVectors i, out float outDepth : SV_Depth) : SV_Target
         {
-            float depth = tex2D(_CameraDepthTexture, i.uv);
+            float depth = tex2D(_CameraDepthTexture, i.uv).r;
             outDepth = depth;
             return half4(CalculateMotion(depth, i.uv, i.ray), 0, 1);
         }
