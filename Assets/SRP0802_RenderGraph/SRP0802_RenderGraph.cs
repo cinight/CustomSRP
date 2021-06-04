@@ -11,8 +11,6 @@ using UnityEngine.Experimental.Rendering;
 public partial class SRP0802_RenderGraph : RenderPipeline
 {
     private RenderGraph graph = new RenderGraph("SRP0802_RenderGraphPass");
-    //private int m_ColorRTid = Shader.PropertyToID("_CameraColorTexture");
-    //private RenderTargetIdentifier m_ColorRT;
 
     public SRP0802_RenderGraph()
     {
@@ -39,11 +37,7 @@ public partial class SRP0802_RenderGraph : RenderPipeline
             bool clearDepth = camera.clearFlags == CameraClearFlags.Nothing? false : true;
             bool clearColor = camera.clearFlags == CameraClearFlags.Color? true : false;
 
-            //Execute RenderGraph
-
-            SRP0802_BasePassData basePassData = Render_SRP0802_BasePass(camera,graph,cull);
-            Render_SRP0802_AddPass(camera,graph,cull,basePassData.m_Albedo,basePassData.m_Emission);
-
+            //Execute graph 
             CommandBuffer cmdRG = CommandBufferPool.Get("ExecuteRenderGraph");
             RenderGraphParameters rgParams = new RenderGraphParameters()
             {
@@ -52,13 +46,14 @@ public partial class SRP0802_RenderGraph : RenderPipeline
                 currentFrameIndex = Time.frameCount
             };
             graph.Begin(rgParams);
+            SRP0802_BasePassData basePassData = Render_SRP0802_BasePass(camera,graph,cull);  //BasePass
+            Render_SRP0802_AddPass(camera,graph,cull,basePassData.m_Albedo,basePassData.m_Emission); //AddPass
             graph.Execute();
-
             context.ExecuteCommandBuffer(cmdRG);
-            context.Submit();
-
             CommandBufferPool.Release(cmdRG);
-
+            
+            //Submit camera rendering
+            context.Submit();
             EndCameraRendering(context,camera);
         }
         

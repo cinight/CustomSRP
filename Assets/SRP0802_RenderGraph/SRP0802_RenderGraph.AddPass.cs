@@ -19,22 +19,6 @@ public partial class SRP0802_RenderGraph
         public RendererListHandle m_renderList;
     }
 
-    // private TextureHandle CreateOutputTexture(RenderGraph graph)
-    // {
-    //     bool colorRT_sRGB = (QualitySettings.activeColorSpace == ColorSpace.Linear);
-
-    //     return graph.CreateTexture(new TextureDesc(Vector2.one)
-    //     {
-    //         colorFormat = GraphicsFormatUtility.GetGraphicsFormat(RenderTextureFormat.Default,colorRT_sRGB),
-    //         enableRandomWrite = false,
-    //         msaaSamples = MSAASamples.None,
-    //         depthBufferBits = DepthBits.Depth24,
-    //         clearBuffer = true,
-    //         clearColor = Color.black,
-    //         name = "AddPassOutput"
-    //     });
-    // }
-
     public void Render_SRP0802_AddPass(Camera camera, RenderGraph graph, CullingResults cull, TextureHandle albedo, TextureHandle emission)
     {
         using (var builder = graph.AddRenderPass<SRP0802_AddPassData>("Add Pass", out var passData))
@@ -65,8 +49,6 @@ public partial class SRP0802_RenderGraph
                 CoreUtils.DrawRendererList( context.renderContext, context.cmd, data.m_renderList_opaque );
                 CoreUtils.DrawRendererList( context.renderContext, context.cmd, data.m_renderList_transparent );
             });
-
-            //return texOut;
         }
     }
 }
