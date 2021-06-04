@@ -21,7 +21,7 @@ public partial class SRP0802_RenderGraph
 
     public void Render_SRP0802_AddPass(Camera camera, RenderGraph graph, CullingResults cull, TextureHandle albedo, TextureHandle emission)
     {
-        using (var builder = graph.AddRenderPass<SRP0802_AddPassData>("Add Pass", out var passData))
+        using (var builder = graph.AddRenderPass<SRP0802_AddPassData>("Add Pass", out var passData, new ProfilingSampler("Add Pass Profiler" ) ) )
         {
             //Textures
             passData.m_Albedo = builder.ReadTexture(albedo);

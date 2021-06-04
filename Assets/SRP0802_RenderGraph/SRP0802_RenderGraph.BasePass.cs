@@ -26,7 +26,7 @@ public partial class SRP0802_RenderGraph
         //Texture description
         TextureDesc colorRTDesc = new TextureDesc(camera.pixelWidth, camera.pixelHeight);
         colorRTDesc.colorFormat = GraphicsFormatUtility.GetGraphicsFormat(RenderTextureFormat.Default,colorRT_sRGB);
-        colorRTDesc.depthBufferBits = DepthBits.Depth24;
+        colorRTDesc.depthBufferBits = 0;
         colorRTDesc.msaaSamples = MSAASamples.None;
         colorRTDesc.enableRandomWrite = false;
         //colorRTDesc.clearBuffer = true;
@@ -46,7 +46,7 @@ public partial class SRP0802_RenderGraph
         //Texture description
         TextureDesc colorRTDesc = new TextureDesc(camera.pixelWidth, camera.pixelHeight);
         colorRTDesc.colorFormat = GraphicsFormatUtility.GetGraphicsFormat(RenderTextureFormat.Default,colorRT_sRGB);
-        colorRTDesc.depthBufferBits = DepthBits.Depth24;
+        colorRTDesc.depthBufferBits = 0;
         colorRTDesc.msaaSamples = MSAASamples.None;
         colorRTDesc.enableRandomWrite = false;
         //colorRTDesc.clearBuffer = true;
@@ -81,7 +81,7 @@ public partial class SRP0802_RenderGraph
 
     public SRP0802_BasePassData Render_SRP0802_BasePass(Camera camera, RenderGraph graph, CullingResults cull)
     {
-        using (var builder = graph.AddRenderPass<SRP0802_BasePassData>( "Base Pass", out var passData ) )
+        using (var builder = graph.AddRenderPass<SRP0802_BasePassData>( "Base Pass", out var passData, new ProfilingSampler("Base Pass Profiler" ) ) )
         {
             //Textures
             TextureHandle Albedo = CreateAlbedoTexture(graph,camera);
