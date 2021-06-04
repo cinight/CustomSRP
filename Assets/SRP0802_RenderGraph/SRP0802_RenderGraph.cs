@@ -5,8 +5,6 @@ using UnityEngine.Rendering;
 using UnityEngine.Experimental.Rendering.RenderGraphModule;
 using UnityEngine.Experimental.Rendering;
 
-//Ref - https://github.com/Unity-Technologies/Graphics/blob/10.x.x/release/com.unity.render-pipelines.core/Tests/Editor/RenderGraphTests.cs
-
 // PIPELINE MAIN --------------------------------------------------------------------------------------------
 public partial class SRP0802_RenderGraph : RenderPipeline
 {
@@ -32,20 +30,6 @@ public partial class SRP0802_RenderGraph : RenderPipeline
             //Camera setup some builtin variables e.g. camera projection matrices etc
             context.SetupCameraProperties(camera);
 
-            //Get the setting from camera component
-            bool drawSkyBox = camera.clearFlags == CameraClearFlags.Skybox? true : false;
-            bool clearDepth = camera.clearFlags == CameraClearFlags.Nothing? false : true;
-            bool clearColor = camera.clearFlags == CameraClearFlags.Color? true : false;
-
-            //Camera clear flag
-            CommandBuffer cmdSK = CommandBufferPool.Get("Clear RT");
-            cmdSK.ClearRenderTarget(clearDepth, clearColor, camera.backgroundColor);
-            context.ExecuteCommandBuffer(cmdSK);
-            cmdSK.Release();
-
-            //Skybox
-            if(drawSkyBox)  {  context.DrawSkybox(camera);  }
-
             //Execute graph 
             CommandBuffer cmdRG = CommandBufferPool.Get("ExecuteRenderGraph");
             RenderGraphParameters rgParams = new RenderGraphParameters()
@@ -55,8 +39,8 @@ public partial class SRP0802_RenderGraph : RenderPipeline
                 currentFrameIndex = Time.frameCount
             };
             graph.Begin(rgParams);
-            SRP0802_BasePassData basePassData = Render_SRP0802_BasePass(camera,graph,cull);  //BasePass
-            Render_SRP0802_AddPass(camera,graph,cull,basePassData.m_Albedo,basePassData.m_Emission); //AddPass
+            SRP0802_BasePassData basePassData = Render_SRP0802_BasePass(camera,graph,cull); //BasePass
+            Render_SRP0802_AddPass(graph,basePassData.m_Albedo,basePassData.m_Emission); //AddPass
             graph.Execute();
             context.ExecuteCommandBuffer(cmdRG);
             CommandBufferPool.Release(cmdRG);

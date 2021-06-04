@@ -17,7 +17,7 @@ public partial class SRP0802_RenderGraph
         public TextureHandle m_Emission;
     }
 
-    public void Render_SRP0802_AddPass(Camera camera, RenderGraph graph, CullingResults cull, TextureHandle albedo, TextureHandle emission)
+    public void Render_SRP0802_AddPass(RenderGraph graph, TextureHandle albedo, TextureHandle emission)
     {
         if(m_material == null) m_material = CoreUtils.CreateEngineMaterial(Shader.Find("Hidden/CustomSRP/SRP0802_RenderGraph/FinalColor"));
 
@@ -26,19 +26,13 @@ public partial class SRP0802_RenderGraph
             //Textures
             passData.m_Albedo = builder.ReadTexture(albedo);
             passData.m_Emission = builder.ReadTexture(emission);
-
-            //Bind output to BackBuffer = render to screen
-            builder.WriteTexture(graph.ImportBackbuffer(BuiltinRenderTextureType.CameraTarget));
-
+            
             //Builder
             builder.SetRenderFunc((SRP0802_AddPassData data, RenderGraphContext context) => 
             {
-                MaterialPropertyBlock mpb = context.renderGraphPool.GetTempMaterialPropertyBlock();
-                mpb.SetTexture("_CameraAlbedoTexture",data.m_Albedo);
-                mpb.SetTexture("_CameraEmissionTexture",data.m_Emission);
-
-                CoreUtils.SetRenderTarget( context.cmd, BuiltinRenderTextureType.CameraTarget );
-                CoreUtils.DrawFullScreen( context.cmd, m_material, mpb );
+                m_material.SetTexture("_CameraAlbedoTexture",data.m_Albedo);
+                m_material.SetTexture("_CameraEmissionTexture",data.m_Emission);
+                context.cmd.Blit( null, BuiltinRenderTextureType.CameraTarget, m_material );
             });
         }
     }

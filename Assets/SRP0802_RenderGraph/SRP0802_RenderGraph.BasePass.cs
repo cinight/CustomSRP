@@ -7,7 +7,7 @@ using UnityEngine.Experimental.Rendering;
 
 // PIPELINE BASE PASS --------------------------------------------------------------------------------------------
 // This pass renders objects into 2 RenderTargets:
-// Albedo - grey texture
+// Albedo - grey texture and the skybox
 // Emission - animated color
 public partial class SRP0802_RenderGraph
 {
@@ -22,7 +22,7 @@ public partial class SRP0802_RenderGraph
         public TextureHandle m_Depth;
     }
 
-    private TextureHandle CreateAlbedoTexture(RenderGraph graph, Camera camera)
+    private TextureHandle CreateColorTexture(RenderGraph graph, Camera camera, string name)
     {
         bool colorRT_sRGB = (QualitySettings.activeColorSpace == ColorSpace.Linear);
 
@@ -34,32 +34,9 @@ public partial class SRP0802_RenderGraph
         colorRTDesc.enableRandomWrite = false;
         colorRTDesc.clearBuffer = true;
         colorRTDesc.clearColor = Color.black;
-        colorRTDesc.name = "Albedo";
+        colorRTDesc.name = name;
 
-        //Create texture
-        TextureHandle tex = graph.CreateTexture(colorRTDesc);
-
-        return tex;
-    }
-
-    private TextureHandle CreateEmissionTexture(RenderGraph graph, Camera camera)
-    {
-        bool colorRT_sRGB = (QualitySettings.activeColorSpace == ColorSpace.Linear);
-
-        //Texture description
-        TextureDesc colorRTDesc = new TextureDesc(camera.pixelWidth, camera.pixelHeight);
-        colorRTDesc.colorFormat = GraphicsFormatUtility.GetGraphicsFormat(RenderTextureFormat.Default,colorRT_sRGB);
-        colorRTDesc.depthBufferBits = 0;
-        colorRTDesc.msaaSamples = MSAASamples.None;
-        colorRTDesc.enableRandomWrite = false;
-        colorRTDesc.clearBuffer = true;
-        colorRTDesc.clearColor = Color.black;
-        colorRTDesc.name = "Emission";
-
-        //Create texture
-        TextureHandle tex = graph.CreateTexture(colorRTDesc);
-
-        return tex;
+        return graph.CreateTexture(colorRTDesc);
     }
 
     private TextureHandle CreateDepthTexture(RenderGraph graph, Camera camera)
@@ -76,20 +53,17 @@ public partial class SRP0802_RenderGraph
         colorRTDesc.clearColor = Color.black;
         colorRTDesc.name = "Depth";
 
-        //Create texture
-        TextureHandle tex = graph.CreateTexture(colorRTDesc);
-
-        return tex;
+        return graph.CreateTexture(colorRTDesc);
     }
 
     public SRP0802_BasePassData Render_SRP0802_BasePass(Camera camera, RenderGraph graph, CullingResults cull)
     {
         using (var builder = graph.AddRenderPass<SRP0802_BasePassData>( "Base Pass", out var passData, new ProfilingSampler("Base Pass Profiler" ) ) )
         {
-            //Textures
-            TextureHandle Albedo = CreateAlbedoTexture(graph,camera);
+            //Textures - Multi-RenderTarget
+            TextureHandle Albedo = CreateColorTexture(graph,camera,"Albedo");
             passData.m_Albedo = builder.UseColorBuffer(Albedo,0);
-            TextureHandle Emission = CreateEmissionTexture(graph,camera);
+            TextureHandle Emission = CreateColorTexture(graph,camera,"Emission");
             passData.m_Emission = builder.UseColorBuffer(Emission,1);
             TextureHandle Depth = CreateDepthTexture(graph,camera);
             passData.m_Depth = builder.UseDepthBuffer(Depth, DepthAccess.Write);
@@ -110,6 +84,9 @@ public partial class SRP0802_RenderGraph
             //Builder
             builder.SetRenderFunc((SRP0802_BasePassData data, RenderGraphContext context) => 
             {
+                //Skybox - this will draw to the first target, i.e. Albedo
+                if(camera.clearFlags == CameraClearFlags.Skybox)  {  context.renderContext.DrawSkybox(camera);  }
+
                 CoreUtils.DrawRendererList( context.renderContext, context.cmd, data.m_renderList_opaque );
                 CoreUtils.DrawRendererList( context.renderContext, context.cmd, data.m_renderList_transparent );
             });
