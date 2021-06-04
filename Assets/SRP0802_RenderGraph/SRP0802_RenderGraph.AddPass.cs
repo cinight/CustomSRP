@@ -6,6 +6,7 @@ using UnityEngine.Experimental.Rendering.RenderGraphModule;
 using UnityEngine.Experimental.Rendering;
 
 // PIPELINE ADD PASS --------------------------------------------------------------------------------------------
+// This pass does a image effect that Albedo + Emission = final color
 public partial class SRP0802_RenderGraph
 {
     Material m_material;
@@ -18,7 +19,7 @@ public partial class SRP0802_RenderGraph
 
     public void Render_SRP0802_AddPass(Camera camera, RenderGraph graph, CullingResults cull, TextureHandle albedo, TextureHandle emission)
     {
-        if(m_material == null) m_material = new Material(Shader.Find("Hidden/CustomSRP/SRP0803/copyColor"));
+        if(m_material == null) m_material = CoreUtils.CreateEngineMaterial(Shader.Find("Hidden/CustomSRP/SRP0802_RenderGraph/FinalColor"));
 
         using (var builder = graph.AddRenderPass<SRP0802_AddPassData>("Add Pass", out var passData, new ProfilingSampler("Add Pass Profiler" ) ) )
         {
@@ -32,7 +33,7 @@ public partial class SRP0802_RenderGraph
             //Builder
             builder.SetRenderFunc((SRP0802_AddPassData data, RenderGraphContext context) => 
             {
-                MaterialPropertyBlock mpb = new MaterialPropertyBlock();
+                MaterialPropertyBlock mpb = context.renderGraphPool.GetTempMaterialPropertyBlock();
                 mpb.SetTexture("_CameraAlbedoTexture",data.m_Albedo);
                 mpb.SetTexture("_CameraEmissionTexture",data.m_Emission);
 

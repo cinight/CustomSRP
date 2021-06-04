@@ -6,6 +6,9 @@ using UnityEngine.Experimental.Rendering.RenderGraphModule;
 using UnityEngine.Experimental.Rendering;
 
 // PIPELINE BASE PASS --------------------------------------------------------------------------------------------
+// This pass renders objects into 2 RenderTargets:
+// Albedo - grey texture
+// Emission - animated color
 public partial class SRP0802_RenderGraph
 {
     ShaderTagId m_PassName1 = new ShaderTagId("SRP0802_Pass1"); //The shader pass tag just for SRP0802
