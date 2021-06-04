@@ -31,6 +31,7 @@ Tested with : Win DX11, Mac Metal
 | `SRP0703_MotionVector` | ![](READMEImages/SRP0703_MotionVector.JPG) | Make motion blur works. Use per-object and camera motion vector |
 | `SRP0801_UGUI` | ![](READMEImages/SRP0801_UGUI.JPG) | Use UICamera to render UGUI, also render 3D objects and particle on UI |
 | `SRP0802_RenderPass` | ![](READMEImages/SRP0802_RenderPass.gif) | Use RenderPass to target multiple color attachments and read / write from / to them |
+| `SRP0802_RenderGraph` | ![](READMEImages/SRP0802_RenderGraph.JPG) | Use RenderGraph to modularize rendering passes. Use Window > Render Pipeline > Render Graph Viewer to see RT read/write status in each pass |
 | `SRP0803_MultiRenderTarget` | ![](READMEImages/SRP0803_MultiRenderTarget.JPG) | Use CommandBuffer.SetRenderTarget() to target multiple color surfaces |
 | `SRP0901_SceneViewFix` | ![](READMEImages/SRP0901_SceneViewFix.JPG) | Make the gizmos / icons appear on scene view |
 | `SRP0902_SceneViewDrawMode` | ![](READMEImages/SRP0902_SceneViewDrawMode.gif) | Adding custom Scene View draw modes |
