@@ -37,6 +37,15 @@ public partial class SRP0802_RenderGraph : RenderPipeline
             bool clearDepth = camera.clearFlags == CameraClearFlags.Nothing? false : true;
             bool clearColor = camera.clearFlags == CameraClearFlags.Color? true : false;
 
+            //Camera clear flag
+            CommandBuffer cmdSK = CommandBufferPool.Get("Clear RT");
+            cmdSK.ClearRenderTarget(clearDepth, clearColor, camera.backgroundColor);
+            context.ExecuteCommandBuffer(cmdSK);
+            cmdSK.Release();
+
+            //Skybox
+            if(drawSkyBox)  {  context.DrawSkybox(camera);  }
+
             //Execute graph 
             CommandBuffer cmdRG = CommandBufferPool.Get("ExecuteRenderGraph");
             RenderGraphParameters rgParams = new RenderGraphParameters()

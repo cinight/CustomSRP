@@ -46,6 +46,7 @@ public partial class SRP0802_RenderGraph
             //Builder
             builder.SetRenderFunc((SRP0802_AddPassData data, RenderGraphContext context) => 
             {
+                CoreUtils.SetRenderTarget( context.cmd, BuiltinRenderTextureType.CameraTarget );
                 CoreUtils.DrawRendererList( context.renderContext, context.cmd, data.m_renderList_opaque );
                 CoreUtils.DrawRendererList( context.renderContext, context.cmd, data.m_renderList_transparent );
             });

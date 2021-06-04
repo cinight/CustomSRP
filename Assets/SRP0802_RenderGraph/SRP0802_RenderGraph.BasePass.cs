@@ -19,18 +19,18 @@ public partial class SRP0802_RenderGraph
         public TextureHandle m_Depth;
     }
 
-    private TextureHandle CreateAlbedoTexture(RenderGraph graph)
+    private TextureHandle CreateAlbedoTexture(RenderGraph graph, Camera camera)
     {
         bool colorRT_sRGB = (QualitySettings.activeColorSpace == ColorSpace.Linear);
 
         //Texture description
-        TextureDesc colorRTDesc = new TextureDesc(Vector2.one);
+        TextureDesc colorRTDesc = new TextureDesc(camera.pixelWidth, camera.pixelHeight);
         colorRTDesc.colorFormat = GraphicsFormatUtility.GetGraphicsFormat(RenderTextureFormat.Default,colorRT_sRGB);
         colorRTDesc.depthBufferBits = DepthBits.Depth24;
         colorRTDesc.msaaSamples = MSAASamples.None;
         colorRTDesc.enableRandomWrite = false;
-        colorRTDesc.clearBuffer = true;
-        colorRTDesc.clearColor = Color.black;
+        //colorRTDesc.clearBuffer = true;
+        //colorRTDesc.clearColor = Color.black;
         colorRTDesc.name = "Albedo";
 
         //Create texture
@@ -39,18 +39,18 @@ public partial class SRP0802_RenderGraph
         return tex;
     }
 
-    private TextureHandle CreateEmissionTexture(RenderGraph graph)
+    private TextureHandle CreateEmissionTexture(RenderGraph graph, Camera camera)
     {
         bool colorRT_sRGB = (QualitySettings.activeColorSpace == ColorSpace.Linear);
 
         //Texture description
-        TextureDesc colorRTDesc = new TextureDesc(Vector2.one);
+        TextureDesc colorRTDesc = new TextureDesc(camera.pixelWidth, camera.pixelHeight);
         colorRTDesc.colorFormat = GraphicsFormatUtility.GetGraphicsFormat(RenderTextureFormat.Default,colorRT_sRGB);
         colorRTDesc.depthBufferBits = DepthBits.Depth24;
         colorRTDesc.msaaSamples = MSAASamples.None;
         colorRTDesc.enableRandomWrite = false;
-        colorRTDesc.clearBuffer = true;
-        colorRTDesc.clearColor = Color.black;
+        //colorRTDesc.clearBuffer = true;
+        //colorRTDesc.clearColor = Color.black;
         colorRTDesc.name = "Emission";
 
         //Create texture
@@ -59,18 +59,18 @@ public partial class SRP0802_RenderGraph
         return tex;
     }
 
-    private TextureHandle CreateDepthTexture(RenderGraph graph)
+    private TextureHandle CreateDepthTexture(RenderGraph graph, Camera camera)
     {
         bool colorRT_sRGB = (QualitySettings.activeColorSpace == ColorSpace.Linear);
 
         //Texture description
-        TextureDesc colorRTDesc = new TextureDesc(Vector2.one);
+        TextureDesc colorRTDesc = new TextureDesc(camera.pixelWidth, camera.pixelHeight);
         colorRTDesc.colorFormat = GraphicsFormatUtility.GetGraphicsFormat(RenderTextureFormat.Depth,colorRT_sRGB);
         colorRTDesc.depthBufferBits = DepthBits.Depth24;
         colorRTDesc.msaaSamples = MSAASamples.None;
         colorRTDesc.enableRandomWrite = false;
-        colorRTDesc.clearBuffer = true;
-        colorRTDesc.clearColor = Color.black;
+        //colorRTDesc.clearBuffer = true;
+        //colorRTDesc.clearColor = Color.black;
         colorRTDesc.name = "Depth";
 
         //Create texture
@@ -84,12 +84,12 @@ public partial class SRP0802_RenderGraph
         using (var builder = graph.AddRenderPass<SRP0802_BasePassData>( "Base Pass", out var passData ) )
         {
             //Textures
-            TextureHandle Albedo = CreateAlbedoTexture(graph);
+            TextureHandle Albedo = CreateAlbedoTexture(graph,camera);
             passData.m_Albedo = builder.UseColorBuffer(Albedo,0);
-            TextureHandle Emission = CreateEmissionTexture(graph);
+            TextureHandle Emission = CreateEmissionTexture(graph,camera);
             passData.m_Emission = builder.UseColorBuffer(Emission,1);
-            TextureHandle Depth = CreateDepthTexture(graph);
-            passData.m_Depth = builder.UseDepthBuffer(Depth, DepthAccess.ReadWrite);
+            TextureHandle Depth = CreateDepthTexture(graph,camera);
+            passData.m_Depth = builder.UseDepthBuffer(Depth, DepthAccess.Write);
 
             //Renderers
             RendererListDesc rendererDesc_base_Opaque = new RendererListDesc(m_PassName1,cull,camera);
