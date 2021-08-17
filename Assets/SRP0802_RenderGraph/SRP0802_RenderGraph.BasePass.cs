@@ -69,13 +69,13 @@ public partial class SRP0802_RenderGraph
             passData.m_Depth = builder.UseDepthBuffer(Depth, DepthAccess.Write);
 
             //Renderers
-            RendererListDesc rendererDesc_base_Opaque = new RendererListDesc(m_PassName1,cull,camera);
+            UnityEngine.Rendering.RendererUtils.RendererListDesc rendererDesc_base_Opaque = new UnityEngine.Rendering.RendererUtils.RendererListDesc(m_PassName1,cull,camera);
             rendererDesc_base_Opaque.sortingCriteria = SortingCriteria.CommonOpaque;
             rendererDesc_base_Opaque.renderQueueRange = RenderQueueRange.opaque;
             RendererListHandle rHandle_base_Opaque = graph.CreateRendererList(rendererDesc_base_Opaque);
             passData.m_renderList_opaque = builder.UseRendererList(rHandle_base_Opaque);
 
-            RendererListDesc rendererDesc_base_Transparent = new RendererListDesc(m_PassName1,cull,camera);
+            UnityEngine.Rendering.RendererUtils.RendererListDesc rendererDesc_base_Transparent = new UnityEngine.Rendering.RendererUtils.RendererListDesc(m_PassName1,cull,camera);
             rendererDesc_base_Transparent.sortingCriteria = SortingCriteria.CommonTransparent;
             rendererDesc_base_Transparent.renderQueueRange = RenderQueueRange.transparent;
             RendererListHandle rHandle_base_Transparent= graph.CreateRendererList(rendererDesc_base_Transparent);
