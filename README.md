@@ -1,10 +1,10 @@
 # CustomSRP
 A new SRP from scratch
 
-Unity version : 2020.3 on master branch \
+Unity version : 2022.1+
 Checkout to branches for older versions
 
-Tested with : Win DX11, Mac Metal
+Tested with : Win DX11
 
 | Scene | Image | Description |
 | --- | - | --- |
