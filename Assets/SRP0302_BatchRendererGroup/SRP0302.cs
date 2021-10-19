@@ -61,6 +61,9 @@ public class SRP0302Instance : RenderPipeline
             DrawingSettings drawSettings = new DrawingSettings(m_PassName, sortingSettings);
             FilteringSettings filterSettings = new FilteringSettings(RenderQueueRange.all);
 
+            //SRPBatcher
+            GraphicsSettings.useScriptableRenderPipelineBatching = true;
+
             //Skybox
             if(drawSkyBox)  {  context.DrawSkybox(camera);  }
 

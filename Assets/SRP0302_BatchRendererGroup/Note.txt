@@ -1,1 +1,4 @@
-More BRG API sample scenes in https://github.com/Unity-Technologies/Graphics/tree/graphics/hrnext/TestProjects/UniversalHybridTest/Assets/SampleScenes
+- More BRG API sample scenes in https://github.com/Unity-Technologies/Graphics/tree/graphics/hrnext/TestProjects/UniversalHybridTest/Assets/SampleScenes
+- ProjectSettings > Player > "Allow Unsafe Code" need to be ON if using BRG API
+- ProjectSettings > Graphics > "BatchRendererGroup Variants" need to be "Keep All" if using BRG API
+- "com.unity.mathematics" and "com.unity.collections" packages are needed for BRGGameObjects scene

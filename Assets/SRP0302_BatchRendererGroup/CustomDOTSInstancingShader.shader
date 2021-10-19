@@ -26,7 +26,8 @@ Shader "Custom/CustomDotsInstancingShader"
 			#include "../_General/ShaderLibrary/Input/InputMacro.hlsl"
 			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
 			#include "../_General/ShaderLibrary/Input/UnityBuiltIn.hlsl"
-            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/UnityInstancing.hlsl"
+			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/UnityInstancing.hlsl"
+			#include "UniversalDOTSInstancing.hlsl"
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/SpaceTransforms.hlsl"
 
 			struct appdata
