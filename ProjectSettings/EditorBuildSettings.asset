@@ -30,6 +30,9 @@ EditorBuildSettings:
     path: Assets/SRP0301_Batching/SRP0301_Batching.unity
     guid: fb75decb166a6b24ebba64fb6187eb31
   - enabled: 1
+    path: Assets/SRP0302_BatchRendererGroup/SRP0302_BatchRendererGroup.unity
+    guid: 0bb81a1ae463d3744b87f6502d48927f
+  - enabled: 1
     path: Assets/SRP0401_NoSpecificPass/SRP0401_NoSpecificPass.unity
     guid: 966491527f2baa447a0544f89eb37a48
   - enabled: 1

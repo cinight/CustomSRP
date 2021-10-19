@@ -1,3 +1,5 @@
+//This is from the BRG API sample scenes in https://github.com/Unity-Technologies/Graphics/tree/graphics/hrnext/TestProjects/UniversalHybridTest/Assets/SampleScenes
+
 using System;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
