@@ -77,6 +77,12 @@ public class SRP0601Instance : RenderPipeline
             };
             FilteringSettings filterSettings = new FilteringSettings(RenderQueueRange.all);
 
+            if(!GraphicsSettings.useScriptableRenderPipelineBatching)
+            {
+                Debug.Log("SRP Batcher is turned off so enabling it for this RenderPipeline now.");
+                GraphicsSettings.useScriptableRenderPipelineBatching = true;
+            }
+
             //Skybox
             if(drawSkyBox)  {  context.DrawSkybox(camera);  }
 
