@@ -36,3 +36,4 @@ sysinfo.txt
 *.unitypackage
 .vscode/settings.json
 Logs/Packages-Update.log
+Logs/
