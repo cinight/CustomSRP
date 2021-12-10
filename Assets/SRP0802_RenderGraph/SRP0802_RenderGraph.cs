@@ -38,10 +38,13 @@ public partial class SRP0802_RenderGraph : RenderPipeline
                 scriptableRenderContext = context,
                 currentFrameIndex = Time.frameCount
             };
-            graph.Begin(rgParams);
-            SRP0802_BasePassData basePassData = Render_SRP0802_BasePass(camera,graph,cull); //BasePass
-            Render_SRP0802_AddPass(graph,basePassData.m_Albedo,basePassData.m_Emission); //AddPass
-            graph.Execute();
+
+            using (graph.RecordAndExecute(rgParams))
+            {
+                SRP0802_BasePassData basePassData = Render_SRP0802_BasePass(camera,graph,cull); //BasePass
+                Render_SRP0802_AddPass(graph,basePassData.m_Albedo,basePassData.m_Emission); //AddPass
+            }
+
             context.ExecuteCommandBuffer(cmdRG);
             CommandBufferPool.Release(cmdRG);
             
