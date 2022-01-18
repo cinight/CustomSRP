@@ -34,6 +34,7 @@ public partial class SRP0802_RenderGraph : RenderPipeline
             CommandBuffer cmdRG = CommandBufferPool.Get("ExecuteRenderGraph");
             RenderGraphParameters rgParams = new RenderGraphParameters()
             {
+                executionName = "SRP0802_RenderGraph_Execute",
                 commandBuffer = cmdRG,
                 scriptableRenderContext = context,
                 currentFrameIndex = Time.frameCount
