@@ -2,6 +2,7 @@
 {
     Properties 
     {
+        _Color ("Main Color", Color) = (1,1,1,1)
         _MainTex ("Particle Texture", 2D) = "white" {}
         _InvFade ("Soft Particles Factor", Range(0.01,3.0)) = 1.0
 
@@ -44,7 +45,8 @@
             float _InvFade;
             sampler2D _MainTex;
             float4 _MainTex_ST;
-       
+
+            float4 _Color;
             float4 _TintColor;
 			float4 _EdgeAroundColor;
 			float _EdgeAroundPower;
@@ -66,7 +68,7 @@
 
             float4 frag (v2f i) : SV_Target
             {
-				half4 col = tex2D(_MainTex, i.texcoord);
+				half4 col = tex2D(_MainTex, i.texcoord) * _Color;
 
                     float2 uv = i.projPos.xy/ i.projPos.z;
 
@@ -74,11 +76,11 @@
                     float partZ = i.projPos.z;
                     float fZ = (sceneZ-partZ);
                     float fade = saturate (_InvFade * fZ);
-                    col.a *= fade;
+                    col.a *= fade*2.0f;
 
                     float edgearound = pow( abs(fade *_EdgeAroundColor.a), _EdgeAroundPower);
                     col.rgb = lerp( _EdgeAroundColor.rgb, col.rgb, edgearound);
-
+                    
                 return col*0.8f;
             }
             ENDHLSL
