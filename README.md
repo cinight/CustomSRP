@@ -12,7 +12,7 @@ Tested with : Win DX11
 | `SRP0102_AssetSettings` | ![](READMEImages/SRP0102_AssetSettings.gif) | Let the SRP Asset to pass some custom variables |
 | `SRP0103_CustomGUI` | ![](READMEImages/SRP0103_CustomGUI.gif) | Have a proper interface for the SRP Asset |
 | `SRP0201_FrustumCulling` | ![](READMEImages/SRP0201_FrustumCulling.gif) | Frustum culling always work. This is a test scene to verify the culling results |
-| `SRP0202_OcclusionCulling` | ![](READMEImages/SRP0202_OcclusionCulling.gif) | Baked Occlusion Culling always work also. This is jsut a test scene to verify it |
+| `SRP0202_OcclusionCulling` | ![](READMEImages/SRP0202_OcclusionCulling.gif) | Baked Occlusion Culling always work also. This is just a test scene to verify it |
 | `SRP0301_Batching` | ![](READMEImages/SRP0301_Batching.JPG) | Use Static Batching, Dynamic Batching, GPU Instancing and SRP Batcher |
 | `SRP0401_NoSpecificPass` | ![](READMEImages/SRP0401_NoSpecificPass.JPG) | To draw the shaders that do not have a tag, e.g. default Unlit shaders |
 | `SRP0402_Multipass` | ![](READMEImages/SRP0402_Multipass.JPG) | In SRP we need to specify the pass names, so no more infinite pass. But we can specify the orders of passes |
@@ -41,8 +41,10 @@ Tested with : Win DX11
 
 -------------
 References / Useful Links:
+- [SRP Core Documentation](https://docs.unity3d.com/Packages/com.unity.render-pipelines.core@latest)
 - [Custom SRP template by phi-lira](https://github.com/phi-lira/CustomSRP)
-- [Custom Pipeline by Catlike Coding](https://catlikecoding.com/unity/tutorials/scriptable-render-pipeline/)
+- [Custom Pipeline for Unity 2018 by Catlike Coding](https://catlikecoding.com/unity/tutorials/scriptable-render-pipeline/)
+- [Custom Pipeline for Unity 2019 by Catlike Coding](https://catlikecoding.com/unity/tutorials/custom-srp/)
 - [URP & HDRP](https://github.com/Unity-Technologies/Graphics)
 - [SRPFromScratch by pbbastian](https://github.com/pbbastian/SRPFromScratch)
 - Siggraph 2018 SRP presentation by Matt Dean
