@@ -66,6 +66,9 @@ EditorBuildSettings:
     path: Assets/SRP0701_HDR_MSAA/SRP0701_HDR_MSAA.unity
     guid: f45d7d050c77835498ef30aa0fcbfb0c
   - enabled: 1
+    path: Assets/SRP0701_HDR_MSAA_RTHandle/SRP0701_HDR_MSAA_RTHandle.unity
+    guid: 3c01bdd995572f34eb0ef88ef1fdfec9
+  - enabled: 1
     path: Assets/SRP0701_Stencil/SRP0701_Stencil.unity
     guid: 2881bd96da9fa4b80a6ab897ede66d7c
   - enabled: 1
