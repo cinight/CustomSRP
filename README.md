@@ -26,6 +26,7 @@ Tested with : Win DX11
 | `SRP0602_BakedLights` | ![](READMEImages/SRP0602_BakedLights.JPG) | Baked Lightmap / Reflection Probe / Light Probes and setup PerObject data for them |
 | `SRP0603_RealtimeShadowDirectional` | ![](READMEImages/SRP0603_RealtimeShadowDirectional.png) | Directional light realtime shadow |
 | `SRP0701_HDR_MSAA` | ![](READMEImages/SRP0701_HDR_MSAA.gif) | Use HDR and MSAA |
+| `SRP0701_HDR_MSAA_RTHandle` | ![](READMEImages/SRP0701_HDR_MSAA.gif) | Same as above, but using RTHandle instead of RenderTargetIdentifier |
 | `SRP0701_Stencil` | ![](READMEImages/SRP0701_Stencil.JPG) | In order to use stencil, we need the render target having at least 24bit depth. This case we use the same pipeline with 0701 |
 | `SRP0702_Postprocessing` | ![](READMEImages/SRP0702_Postprocessing.gif) | This shows you how to use Postprocessing Stack with SRP (transparent effects e.g. Bloom, Depth of Field) |
 | `SRP0703_MotionVector` | ![](READMEImages/SRP0703_MotionVector.JPG) | Make motion blur works. Use per-object and camera motion vector |
