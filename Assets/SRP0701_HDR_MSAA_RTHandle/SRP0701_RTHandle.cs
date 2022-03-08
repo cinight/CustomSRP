@@ -1,4 +1,5 @@
 //RTHandle documentation - https://docs.unity3d.com/Packages/com.unity.render-pipelines.core@14.0/manual/rthandle-system-using.html
+//URP upgrade guide has some explanations about RTHandle - https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@13.1/manual/upgrade-guide-2022-1.html
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -23,11 +24,10 @@ public class SRP0701_RTHandle : RenderPipelineAsset
 
 public class SRP0701_RTHandleInstance : RenderPipeline
 {
-    private static readonly ShaderTagId m_PassName = new ShaderTagId("SRP0701_RTHandle_Pass"); //The shader pass tag just for SRP0701_RTHandle
+    private static readonly ShaderTagId m_PassName = new ShaderTagId("SRP0701_Pass"); //We are reusing the shaders in SRP0701
     private static UnityEngine.Experimental.Rendering.GraphicsFormat m_ColorFormatHDR = SystemInfo.GetGraphicsFormat(UnityEngine.Experimental.Rendering.DefaultFormat.HDR);
     private static UnityEngine.Experimental.Rendering.GraphicsFormat m_ColorFormat = SystemInfo.GetGraphicsFormat(UnityEngine.Experimental.Rendering.DefaultFormat.LDR);
-    private static UnityEngine.Experimental.Rendering.GraphicsFormat m_DepthFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.None; //RenderTextureFormat.Depth
-    private DepthBits depthBufferBits = DepthBits.Depth24; //16 won't have stencil
+    //private DepthBits depth = DepthBits.Depth16; //16 won't have stencil
 
     public SRP0701_RTHandleInstance()
     {
@@ -56,11 +56,9 @@ public class SRP0701_RTHandleInstance : RenderPipeline
             {
                 case CameraClearFlags.Skybox: clear = ClearFlag.Depth; break;
                 case CameraClearFlags.Nothing: clear = ClearFlag.None; break;
-                case CameraClearFlags.Color: clear = ClearFlag.Color; break;
+                case CameraClearFlags.Color: clear = ClearFlag.All; break;
             }
-
-            //************************** Start Set TempRT ************************************
-            
+           
             UnityEngine.Experimental.Rendering.GraphicsFormat format = camera.allowHDR ? m_ColorFormatHDR : m_ColorFormat;
             MSAASamples msaa = MSAASamples.None;
             if(camera.allowMSAA)
@@ -73,16 +71,15 @@ public class SRP0701_RTHandleInstance : RenderPipeline
                 }
             }
 
+            //Setup RTHandle
             RTHandles.Initialize(Screen.width, Screen.height);
             RTHandles.SetReferenceSize(camera.pixelWidth, camera.pixelHeight);
-            RTHandle m_ColorRT = RTHandles.Alloc(scaleFactor: Vector2.one, colorFormat: format, depthBufferBits: depthBufferBits, msaaSamples: msaa, name: "_CameraColorRT");
-            RTHandle m_DepthRT = RTHandles.Alloc(scaleFactor: Vector2.one, colorFormat: m_DepthFormat, depthBufferBits: depthBufferBits, name: "_CameraDepthRT");
-
-            //************************** End Set TempRT ************************************
+            RTHandle m_ColorRT = RTHandles.Alloc(scaleFactor: Vector2.one, colorFormat: format, depthBufferBits: DepthBits.None, msaaSamples: msaa, name: "_CameraColorRT");
 
             //Set RenderTarget & Camera clear flag
             CommandBuffer cmd = new CommandBuffer();
-            CoreUtils.SetRenderTarget(cmd,m_ColorRT,m_DepthRT,clear);
+            cmd.name = "SetRT and Clear";
+            CoreUtils.SetRenderTarget(cmd,m_ColorRT,clear,camera.backgroundColor);
             context.ExecuteCommandBuffer(cmd);
             cmd.Release();
 
@@ -94,17 +91,25 @@ public class SRP0701_RTHandleInstance : RenderPipeline
             //Skybox
             if(camera.clearFlags == CameraClearFlags.Skybox)  {  context.DrawSkybox(camera);  }
 
-            //Opaque objects
-            sortingSettings.criteria = SortingCriteria.CommonOpaque;
-            drawSettings.sortingSettings = sortingSettings;
-            filterSettings.renderQueueRange = RenderQueueRange.opaque;
-            context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
+            //RendererList Opaque
+            UnityEngine.Rendering.RendererUtils.RendererListDesc rendererDesc_Opaque = new UnityEngine.Rendering.RendererUtils.RendererListDesc(m_PassName,cull,camera);
+            rendererDesc_Opaque.sortingCriteria = SortingCriteria.CommonOpaque;
+            rendererDesc_Opaque.renderQueueRange = RenderQueueRange.opaque;
+            UnityEngine.Rendering.RendererUtils.RendererList rdlist_Opaque = context.CreateRendererList(rendererDesc_Opaque);
 
-            //Transparent objects
-            sortingSettings.criteria = SortingCriteria.CommonTransparent;
-            drawSettings.sortingSettings = sortingSettings;
-            filterSettings.renderQueueRange = RenderQueueRange.transparent;
-            context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
+            //RendererList Transparent
+            UnityEngine.Rendering.RendererUtils.RendererListDesc rendererDesc_Transparent = new UnityEngine.Rendering.RendererUtils.RendererListDesc(m_PassName,cull,camera);
+            rendererDesc_Transparent.sortingCriteria = SortingCriteria.CommonTransparent;
+            rendererDesc_Transparent.renderQueueRange = RenderQueueRange.transparent;
+            UnityEngine.Rendering.RendererUtils.RendererList rdlist_Transparent = context.CreateRendererList(rendererDesc_Transparent);
+
+            //Draw RendererLists
+            CommandBuffer cmdRender = new CommandBuffer();
+            cmdRender.name = "Draw RendererLists";
+            CoreUtils.DrawRendererList(context,cmdRender,rdlist_Opaque);
+            CoreUtils.DrawRendererList(context,cmdRender,rdlist_Transparent);
+            context.ExecuteCommandBuffer(cmdRender);
+            cmdRender.Release();
 
             //Blit the content back to screen
             CommandBuffer cmdBlitToCam = new CommandBuffer();
@@ -113,21 +118,14 @@ public class SRP0701_RTHandleInstance : RenderPipeline
             context.ExecuteCommandBuffer(cmdBlitToCam);
             cmdBlitToCam.Release();
             
-            //Cleanup
-            RTHandles.Release(m_ColorRT);
-            RTHandles.Release(m_DepthRT);
-
             context.Submit();
 
             EndCameraRendering(context,camera);
+
+            //Cleanup
+            RTHandles.Release(m_ColorRT);
         }
 
         EndFrameRendering(context,cameras);
-    }
-
-    //************************** Clean Up ************************************
-    protected override void Dispose(bool disposing)
-    {
-        
     }
 }
