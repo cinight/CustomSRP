@@ -1,7 +1,7 @@
 # CustomSRP
 A new SRP from scratch
 
-Unity version : 2022.1+
+Unity version : 2022.2+
 Checkout to branches for older versions
 
 Tested with : Win DX11

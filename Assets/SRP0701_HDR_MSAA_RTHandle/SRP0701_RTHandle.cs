@@ -95,13 +95,13 @@ public class SRP0701_RTHandleInstance : RenderPipeline
             UnityEngine.Rendering.RendererUtils.RendererListDesc rendererDesc_Opaque = new UnityEngine.Rendering.RendererUtils.RendererListDesc(m_PassName,cull,camera);
             rendererDesc_Opaque.sortingCriteria = SortingCriteria.CommonOpaque;
             rendererDesc_Opaque.renderQueueRange = RenderQueueRange.opaque;
-            UnityEngine.Rendering.RendererUtils.RendererList rdlist_Opaque = context.CreateRendererList(rendererDesc_Opaque);
+            UnityEngine.Rendering.RendererList rdlist_Opaque = context.CreateRendererList(rendererDesc_Opaque);
 
             //RendererList Transparent
             UnityEngine.Rendering.RendererUtils.RendererListDesc rendererDesc_Transparent = new UnityEngine.Rendering.RendererUtils.RendererListDesc(m_PassName,cull,camera);
             rendererDesc_Transparent.sortingCriteria = SortingCriteria.CommonTransparent;
             rendererDesc_Transparent.renderQueueRange = RenderQueueRange.transparent;
-            UnityEngine.Rendering.RendererUtils.RendererList rdlist_Transparent = context.CreateRendererList(rendererDesc_Transparent);
+            UnityEngine.Rendering.RendererList rdlist_Transparent = context.CreateRendererList(rendererDesc_Transparent);
 
             //Draw RendererLists
             CommandBuffer cmdRender = new CommandBuffer();
