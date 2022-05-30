@@ -32,6 +32,7 @@ public class SRP0406Instance : RenderPipeline
     {
         BeginFrameRendering(context,cameras);
 
+        //Remember to add ENABLE_SHADER_DEBUG_PRINT in ProjectSettings > Player
         #if ENABLE_SHADER_DEBUG_PRINT
             CommandBuffer cmd_shaderDebug = new CommandBuffer();
             cmd_shaderDebug.name = "Shader Debug Print";
@@ -92,6 +93,7 @@ public class SRP0406Instance : RenderPipeline
 
         EndFrameRendering(context,cameras);
 
+        //ENABLE_SHADER_DEBUG_PRINT EndFrame
         #if ENABLE_SHADER_DEBUG_PRINT
             ShaderDebugPrintManager.instance.EndFrame();
         #endif

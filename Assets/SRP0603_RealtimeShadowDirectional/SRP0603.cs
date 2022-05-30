@@ -195,7 +195,8 @@ public class SRP0603Instance : RenderPipeline
         //************************** Shadow Mapping ************************************
         if (doShadow)
         {
-            ShadowDrawingSettings shadowSettings = new ShadowDrawingSettings(cull, lightIndex);
+            BatchCullingProjectionType projType = cam.orthographic? BatchCullingProjectionType.Orthographic : BatchCullingProjectionType.Perspective;
+            ShadowDrawingSettings shadowSettings = new ShadowDrawingSettings(cull, lightIndex, projType);
 
             //For shadowmapping, the matrices from the light's point of view
             Matrix4x4 view = Matrix4x4.identity;
