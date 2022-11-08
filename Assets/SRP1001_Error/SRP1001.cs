@@ -61,7 +61,7 @@ public class SRP1001Instance : RenderPipeline
             {
                 errorSettings.SetShaderPassName(i, m_LegacyShaderPassNames[i]);
             }
-            context.DrawRenderers(cull, ref errorSettings, ref filterSettings);
+            CustomSRPUtil.RenderObjects("Render Error Objects", context, cull, filterSettings, errorSettings);
         }
     }
 
@@ -99,13 +99,16 @@ public class SRP1001Instance : RenderPipeline
             FilteringSettings filterSettings = new FilteringSettings(RenderQueueRange.all);
 
             //Skybox
-            if(drawSkyBox)  {  context.DrawSkybox(camera);  }
+            if(drawSkyBox)
+            {
+                CustomSRPUtil.RenderSkybox(context, camera);
+            }
 
             //Opaque objects
             sortingSettings.criteria = SortingCriteria.CommonOpaque;
             drawSettings.sortingSettings = sortingSettings;
             filterSettings.renderQueueRange = RenderQueueRange.opaque;
-            context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
+            CustomSRPUtil.RenderObjects("Render Opaque Objects", context, cull, filterSettings, drawSettings);
 
             //Error Opaque
             //DrawErrorShader(context,sortingSettings,cull,filterSettings);
@@ -114,7 +117,7 @@ public class SRP1001Instance : RenderPipeline
             sortingSettings.criteria = SortingCriteria.CommonTransparent;
             drawSettings.sortingSettings = sortingSettings;
             filterSettings.renderQueueRange = RenderQueueRange.transparent;
-            context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
+            CustomSRPUtil.RenderObjects("Render Transparent Objects", context, cull, filterSettings, drawSettings);
 
             //Error Opaque+Transparent
             DrawErrorShader(context,sortingSettings,cull,filterSettings);

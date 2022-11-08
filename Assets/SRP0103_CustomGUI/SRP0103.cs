@@ -48,7 +48,10 @@ namespace SRP0103
                 FilteringSettings filterSettings = new FilteringSettings(RenderQueueRange.all);
 
                 //Skybox
-                if(drawSkyBox)  {  context.DrawSkybox(camera);  }
+                if(drawSkyBox)
+                {
+                    CustomSRPUtil.RenderSkybox(context, camera);
+                }
 
                 //Opaque objects
                 if(m_PipelineAsset.drawOpaqueObjects) //Use the settings on the asset
@@ -56,7 +59,7 @@ namespace SRP0103
                     sortingSettings.criteria = SortingCriteria.CommonOpaque;
                     drawSettings.sortingSettings = sortingSettings;
                     filterSettings.renderQueueRange = RenderQueueRange.opaque;
-                    context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
+                    CustomSRPUtil.RenderObjects("Render Opaque Objects", context, cull, filterSettings, drawSettings);
                 }
 
                 //Transparent objects
@@ -65,7 +68,7 @@ namespace SRP0103
                     sortingSettings.criteria = SortingCriteria.CommonTransparent;
                     drawSettings.sortingSettings = sortingSettings;
                     filterSettings.renderQueueRange = RenderQueueRange.transparent;
-                    context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
+                    CustomSRPUtil.RenderObjects("Render Transparent Objects", context, cull, filterSettings, drawSettings);
                 }
 
                 context.Submit();

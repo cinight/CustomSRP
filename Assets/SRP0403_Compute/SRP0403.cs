@@ -94,13 +94,14 @@ namespace SRP0403
                 sortingSettings.criteria = SortingCriteria.CommonOpaque;
                 drawSettingsDepth.sortingSettings = sortingSettings;
                 filterSettings.renderQueueRange = RenderQueueRange.opaque;
-                context.DrawRenderers(cull, ref drawSettingsDepth, ref filterSettings);
+                CustomSRPUtil.RenderObjects("Render Opaque Objects Depth", context, cull, filterSettings, drawSettingsDepth);
 
                 //Draw Depth with Transparent objects
                 sortingSettings.criteria = SortingCriteria.CommonTransparent;
                 drawSettingsDepth.sortingSettings = sortingSettings;
                 filterSettings.renderQueueRange = RenderQueueRange.transparent;
-                context.DrawRenderers(cull, ref drawSettingsDepth, ref filterSettings);
+                CustomSRPUtil.RenderObjects("Render Transparent Objects Depth", context, cull, filterSettings, drawSettingsDepth);
+
 
                 //To let shader has _CameraDepthTexture
                 CommandBuffer cmdDepthTexture = new CommandBuffer();
@@ -117,19 +118,23 @@ namespace SRP0403
                 cmd.Release();
 
                 //Skybox
-                if(drawSkyBox)  {  context.DrawSkybox(camera);  }
+                if(drawSkyBox)
+                {
+                    CustomSRPUtil.RenderSkybox(context, camera);
+                }
 
                 //Opaque objects
                 sortingSettings.criteria = SortingCriteria.CommonOpaque;
                 drawSettings.sortingSettings = sortingSettings;
                 filterSettings.renderQueueRange = RenderQueueRange.opaque;
-                context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
+                CustomSRPUtil.RenderObjects("Render Opaque Objects", context, cull, filterSettings, drawSettings);
+
 
                 //Transparent objects
                 sortingSettings.criteria = SortingCriteria.CommonTransparent;
                 drawSettings.sortingSettings = sortingSettings;
                 filterSettings.renderQueueRange = RenderQueueRange.transparent;
-                context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
+                CustomSRPUtil.RenderObjects("Render Transparent Objects", context, cull, filterSettings, drawSettings);
 
                 //Run Compute shader
                 if(m_PipelineAsset.computeShader != null)

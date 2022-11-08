@@ -1,3 +1,3 @@
-- More BRG API sample scenes in https://github.com/Unity-Technologies/Graphics/tree/graphics/hrnext/TestProjects/UniversalHybridTest/Assets/SampleScenes
+- More BRG API sample scenes in https://github.com/Unity-Technologies/Graphics/tree/master/Tests/SRPTests/Projects/BatchRendererGroup_URP
 - ProjectSettings > Player > "Allow Unsafe Code" need to be ON if using BRG API
 - For Player building, ProjectSettings > Graphics > "BatchRendererGroup Variants" need to be "Keep All" if using BRG API

@@ -89,7 +89,7 @@ public class SRP0701_RTHandleInstance : RenderPipeline
             FilteringSettings filterSettings = new FilteringSettings(RenderQueueRange.all);
 
             //Skybox
-            if(camera.clearFlags == CameraClearFlags.Skybox)  {  context.DrawSkybox(camera);  }
+            if(camera.clearFlags == CameraClearFlags.Skybox)  {  CustomSRPUtil.RenderSkybox(context, camera);  }
 
             //RendererList Opaque
             UnityEngine.Rendering.RendererUtils.RendererListDesc rendererDesc_Opaque = new UnityEngine.Rendering.RendererUtils.RendererListDesc(m_PassName,cull,camera);

@@ -122,7 +122,7 @@ public class SRP0603Instance : RenderPipeline
             sortingSettings.criteria = SortingCriteria.CommonOpaque;
             drawSettingsDepth.sortingSettings = sortingSettings;
             filterSettings.renderQueueRange = RenderQueueRange.opaque;
-            context.DrawRenderers(cull, ref drawSettingsDepth, ref filterSettings);
+            CustomSRPUtil.RenderObjects("Render Opaque Objects Depth", context, cull, filterSettings, drawSettingsDepth);
 
             //To let shader has _CameraDepthTexture
             CommandBuffer cmdDepthTexture = new CommandBuffer();
@@ -156,19 +156,22 @@ public class SRP0603Instance : RenderPipeline
             CommandBufferPool.Release(cmd);
 
             //Skybox
-            if(drawSkyBox)  {  context.DrawSkybox(camera);  }
+            if(drawSkyBox)
+            {
+                CustomSRPUtil.RenderSkybox(context, camera);
+            }
 
             //Opaque objects
             sortingSettings.criteria = SortingCriteria.CommonOpaque;
             drawSettings.sortingSettings = sortingSettings;
             filterSettings.renderQueueRange = RenderQueueRange.opaque;
-            context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
+            CustomSRPUtil.RenderObjects("Render Opaque Objects", context, cull, filterSettings, drawSettings);
 
             //Transparent objects
             sortingSettings.criteria = SortingCriteria.CommonTransparent;
             drawSettings.sortingSettings = sortingSettings;
             filterSettings.renderQueueRange = RenderQueueRange.transparent;
-            context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
+            CustomSRPUtil.RenderObjects("Render Transparent Objects", context, cull, filterSettings, drawSettings);
 
             //Clean Up
             CommandBuffer cmdclean = new CommandBuffer();
@@ -195,9 +198,6 @@ public class SRP0603Instance : RenderPipeline
         //************************** Shadow Mapping ************************************
         if (doShadow)
         {
-            BatchCullingProjectionType projType = cam.orthographic? BatchCullingProjectionType.Orthographic : BatchCullingProjectionType.Perspective;
-            ShadowDrawingSettings shadowSettings = new ShadowDrawingSettings(cull, lightIndex, projType);
-
             //For shadowmapping, the matrices from the light's point of view
             Matrix4x4 view = Matrix4x4.identity;
             Matrix4x4 proj = Matrix4x4.identity;
@@ -212,7 +212,18 @@ public class SRP0603Instance : RenderPipeline
                     0, 1, new Vector3(1,0,0),
                     m_ShadowRes, light.shadowNearPlane, out view, out proj, out splitData
                 );
-                shadowSettings.splitData = splitData;
+
+                BatchCullingProjectionType projType = cam.orthographic? BatchCullingProjectionType.Orthographic : BatchCullingProjectionType.Perspective;
+                ShadowCastersCullingInfos infos = new ShadowCastersCullingInfos();
+                infos.perLightInfos = new NativeArray<LightShadowCasterCullingInfo>(1,Allocator.Temp);
+                infos.perLightInfos[lightIndex] = new LightShadowCasterCullingInfo()
+                {
+                    splitRange = new RangeInt(0,1), //0 offset and 1 slice
+                    projectionType = projType
+                };
+                infos.splitBuffer = new NativeArray<ShadowSplitData>(1,Allocator.Temp);
+                infos.splitBuffer[lightIndex] = splitData;
+                context.CullShadowCasters(cull,infos);
             }
             else return;
 
@@ -230,7 +241,13 @@ public class SRP0603Instance : RenderPipeline
                 cmdShadow.Clear();
 
                 //Render Shadowmap
-                context.DrawShadows(ref shadowSettings);
+                ShadowDrawingSettings shadowSettings = new ShadowDrawingSettings(cull, lightIndex);
+                RendererList rl_shadow = context.CreateShadowRendererList(ref shadowSettings);
+                CommandBuffer cmd_shadow = new CommandBuffer();
+                cmd_shadow.name = "Render Shadowmap";
+                cmd_shadow.DrawRendererList(rl_shadow);
+                context.ExecuteCommandBuffer(cmd_shadow);
+                cmd_shadow.Release();
                 
                 //Set shadowmap texture
                 cmdShadow.DisableScissorRect();

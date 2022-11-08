@@ -113,31 +113,34 @@ public class SRP0802Instance : RenderPipeline
                     sortingSettings.criteria = SortingCriteria.CommonOpaque;
                     drawSettings1.sortingSettings = sortingSettings;
                     filterSettings.renderQueueRange = RenderQueueRange.opaque;
-                    context.DrawRenderers(cull, ref drawSettings1, ref filterSettings);
+                    CustomSRPUtil.RenderObjects("Render Opaque Objects to Albedo/Emission", context, cull, filterSettings, drawSettings1);
 
                     //Transparent objects
                     sortingSettings.criteria = SortingCriteria.CommonTransparent;
                     drawSettings1.sortingSettings = sortingSettings;
                     filterSettings.renderQueueRange = RenderQueueRange.transparent;
-                    context.DrawRenderers(cull, ref drawSettings1, ref filterSettings);
+                    CustomSRPUtil.RenderObjects("Render Transparent Objects to Albedo/Emission", context, cull, filterSettings, drawSettings1);
                 }
                 //Read from Albedo & Emission, then output to Output
                 using ( context.BeginScopedSubPass(renderPassOutputAttachments,renderPassColorAttachments) )
                 {
                     //Skybox
-                    if(drawSkyBox)  {  context.DrawSkybox(camera);  }
+                    if(drawSkyBox)
+                    {
+                        CustomSRPUtil.RenderSkybox(context, camera);
+                    }
 
                     //Opaque objects
                     sortingSettings.criteria = SortingCriteria.CommonOpaque;
                     drawSettings2.sortingSettings = sortingSettings;
                     filterSettings.renderQueueRange = RenderQueueRange.opaque;
-                    context.DrawRenderers(cull, ref drawSettings2, ref filterSettings);
+                    CustomSRPUtil.RenderObjects("Render Opaque Objects to Output", context, cull, filterSettings, drawSettings2);
 
                     //Transparent objects
                     sortingSettings.criteria = SortingCriteria.CommonTransparent;
                     drawSettings2.sortingSettings = sortingSettings;
                     filterSettings.renderQueueRange = RenderQueueRange.transparent;
-                    context.DrawRenderers(cull, ref drawSettings2, ref filterSettings);
+                    CustomSRPUtil.RenderObjects("Render Transparent Objects to Output", context, cull, filterSettings, drawSettings2);
                 }
             }
 

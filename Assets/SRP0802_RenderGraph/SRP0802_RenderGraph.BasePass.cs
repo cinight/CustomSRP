@@ -85,7 +85,7 @@ public partial class SRP0802_RenderGraph
             builder.SetRenderFunc((SRP0802_BasePassData data, RenderGraphContext context) => 
             {
                 //Skybox - this will draw to the first target, i.e. Albedo
-                if(camera.clearFlags == CameraClearFlags.Skybox)  {  context.renderContext.DrawSkybox(camera);  }
+                if(camera.clearFlags == CameraClearFlags.Skybox)  {  CustomSRPUtil.RenderSkybox(context.renderContext, camera); }
 
                 CoreUtils.DrawRendererList( context.renderContext, context.cmd, data.m_renderList_opaque );
                 CoreUtils.DrawRendererList( context.renderContext, context.cmd, data.m_renderList_transparent );

@@ -55,7 +55,10 @@ namespace SRP0404
                 FilteringSettings filterSettings = new FilteringSettings(RenderQueueRange.all);
 
                 //Skybox
-                if(drawSkyBox)  {  context.DrawSkybox(camera);  }
+                if(drawSkyBox)
+                {
+                    CustomSRPUtil.RenderSkybox(context, camera);
+                }
 
                 //Define positions
                 positions.Clear();

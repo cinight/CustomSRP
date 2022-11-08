@@ -190,7 +190,8 @@ public class SRP0703Instance : RenderPipeline
             sortingSettings.criteria = SortingCriteria.CommonOpaque;
             drawSettingsDepth.sortingSettings = sortingSettings;
             filterSettingsDepth.renderQueueRange = RenderQueueRange.opaque;
-            context.DrawRenderers(cull, ref drawSettingsDepth, ref filterSettingsDepth);
+            CustomSRPUtil.RenderObjects("Render Opaque Objects Depth", context, cull, filterSettingsDepth, drawSettingsDepth);
+
 
             //To let shader has _CameraDepthTexture
             CommandBuffer cmdDepthTexture = new CommandBuffer();
@@ -212,7 +213,7 @@ public class SRP0703Instance : RenderPipeline
             sortingSettings.criteria = SortingCriteria.CommonOpaque;
             drawSettingsMotionVector.sortingSettings = sortingSettings;
             filterSettingsMotionVector.renderQueueRange = RenderQueueRange.opaque;
-            context.DrawRenderers(cull, ref drawSettingsMotionVector, ref filterSettingsMotionVector);
+            CustomSRPUtil.RenderObjects("Render Opaque Objects Motion Vector", context, cull, filterSettingsMotionVector, drawSettingsMotionVector);
 
             //Camera motion vector
             CommandBuffer cmdCameraMotionVector = new CommandBuffer();
@@ -243,13 +244,13 @@ public class SRP0703Instance : RenderPipeline
             cmd.Release();
 
             //Skybox
-            if(drawSkyBox)  {  context.DrawSkybox(camera);  }
+            if(drawSkyBox)  {  CustomSRPUtil.RenderSkybox(context, camera);  }
 
             //Opaque objects
             sortingSettings.criteria = SortingCriteria.CommonOpaque;
             drawSettings.sortingSettings = sortingSettings;
             filterSettings.renderQueueRange = RenderQueueRange.opaque;
-            context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
+            CustomSRPUtil.RenderObjects("Render Opaque Objects", context, cull, filterSettings, drawSettings);
 
             //************************** SetUp Post-processing ************************************
             
@@ -291,7 +292,7 @@ public class SRP0703Instance : RenderPipeline
             sortingSettings.criteria = SortingCriteria.CommonTransparent;
             drawSettings.sortingSettings = sortingSettings;
             filterSettings.renderQueueRange = RenderQueueRange.transparent;
-            context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
+            CustomSRPUtil.RenderObjects("Render Transparent Objects", context, cull, filterSettings, drawSettings);
 
             //************************** Transparent Post-processing ************************************
             //Bloom, Vignette, Grain, ColorGrading, LensDistortion, Chromatic Aberration, Auto Exposure, Motion Blur

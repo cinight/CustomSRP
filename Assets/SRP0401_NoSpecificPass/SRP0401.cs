@@ -65,27 +65,30 @@ public class SRP0401Instance : RenderPipeline
             FilteringSettings filterSettings = new FilteringSettings(RenderQueueRange.all);
 
             //Skybox
-            if(drawSkyBox)  {  context.DrawSkybox(camera);  }
+            if(drawSkyBox)
+            {
+                CustomSRPUtil.RenderSkybox(context, camera);
+            }
 
             //Opaque objects
             sortingSettings.criteria = SortingCriteria.CommonOpaque;
             drawSettings.sortingSettings = sortingSettings;
             filterSettings.renderQueueRange = RenderQueueRange.opaque;
-            context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
+            CustomSRPUtil.RenderObjects("Render Opaque Objects", context, cull, filterSettings, drawSettings);
 
             //Opaque default
             drawSettingsDefault.sortingSettings = sortingSettings;
-            context.DrawRenderers(cull, ref drawSettingsDefault, ref filterSettings);
+            CustomSRPUtil.RenderObjects("Render Opaque Objects Default Pass", context, cull, filterSettings, drawSettingsDefault);
 
             //Transparent objects
             sortingSettings.criteria = SortingCriteria.CommonTransparent;
             drawSettings.sortingSettings = sortingSettings;
             filterSettings.renderQueueRange = RenderQueueRange.transparent;
-            context.DrawRenderers(cull, ref drawSettings, ref filterSettings);
+            CustomSRPUtil.RenderObjects("Render Transparent Objects", context, cull, filterSettings, drawSettings);
 
             //Transparent default
             drawSettingsDefault.sortingSettings = sortingSettings;
-            context.DrawRenderers(cull, ref drawSettingsDefault, ref filterSettings);
+            CustomSRPUtil.RenderObjects("Render Transparent Objects Default Pass", context, cull, filterSettings, drawSettingsDefault);
 
             context.Submit();
             
