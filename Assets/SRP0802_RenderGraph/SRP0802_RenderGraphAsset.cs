@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 [ExecuteInEditMode]
-public class SRP0802_RenderGraphAsset : RenderPipelineAsset
+public class SRP0802_RenderGraphAsset : RenderPipelineAsset<SRP0802_RenderGraph>
 {
     #if UNITY_EDITOR
     [UnityEditor.MenuItem("Assets/Create/Render Pipeline/SRP0802_RenderGraph", priority = 1)]

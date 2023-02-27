@@ -4,7 +4,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.PostProcessing;
 
 [ExecuteInEditMode]
-public class SRP0702 : RenderPipelineAsset
+public class SRP0702 : RenderPipelineAsset<SRP0702Instance>
 {
     #if UNITY_EDITOR
     [UnityEditor.MenuItem("Assets/Create/Render Pipeline/SRP0702", priority = 1)]

@@ -9,7 +9,7 @@ using UnityEditor.ProjectWindowCallback;
 namespace SRP0404
 {
     [ExecuteInEditMode]
-    public class SRP0404_Asset : RenderPipelineAsset
+    public class SRP0404_Asset : RenderPipelineAsset<SRP0404>
     {
         public Mesh mesh;
         public Material mat;

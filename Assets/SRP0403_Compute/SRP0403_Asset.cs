@@ -9,7 +9,7 @@ using UnityEditor.ProjectWindowCallback;
 namespace SRP0403
 {
     [ExecuteInEditMode]
-    public class SRP0403_Asset : RenderPipelineAsset
+    public class SRP0403_Asset : RenderPipelineAsset<SRP0403>
     {
         public ComputeShader computeShader;
         public float edgeDetect = 1;

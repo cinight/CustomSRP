@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 [ExecuteInEditMode]
-public class SRP0701_RTHandle : RenderPipelineAsset
+public class SRP0701_RTHandle : RenderPipelineAsset<SRP0701_RTHandleInstance>
 {
     #if UNITY_EDITOR
     [UnityEditor.MenuItem("Assets/Create/Render Pipeline/SRP0701_RTHandle", priority = 1)]

@@ -9,7 +9,7 @@ using UnityEditor.ProjectWindowCallback;
 namespace SRP0102
 {
     [ExecuteInEditMode]
-    public class SRP0102_Asset : RenderPipelineAsset
+    public class SRP0102_Asset : RenderPipelineAsset<SRP0102>
     {
         public bool drawOpaqueObjects = true;
         public bool drawTransparentObjects = true;

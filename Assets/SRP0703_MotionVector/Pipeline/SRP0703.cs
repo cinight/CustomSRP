@@ -4,7 +4,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.PostProcessing;
 
 [ExecuteInEditMode]
-public class SRP0703 : RenderPipelineAsset
+public class SRP0703 : RenderPipelineAsset<SRP0703Instance>
 {
     public bool motionVectorDebug = false;
 
