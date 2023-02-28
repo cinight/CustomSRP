@@ -68,7 +68,6 @@
 			#pragma vertex vert
 			#pragma fragment frag
 			#include "../_General/ShaderLibrary/Input/Transformation.hlsl"
-			#include "SRP0802_HLSLSupport.cginc"
 
 			struct appdata
 			{
@@ -87,13 +86,13 @@
 				return o;
 			}
 			
-			UNITY_DECLARE_FRAMEBUFFER_INPUT_FLOAT(0);
-			UNITY_DECLARE_FRAMEBUFFER_INPUT_FLOAT(1);
+			FRAMEBUFFER_INPUT_FLOAT(0);
+			FRAMEBUFFER_INPUT_FLOAT(1);
 
 			float4 frag (v2f i) : SV_Target
 			{
-				float4 albedo = UNITY_READ_FRAMEBUFFER_INPUT(0, i.vertex.xyz);
-				float4 emission = UNITY_READ_FRAMEBUFFER_INPUT(1, i.vertex.xyz);
+				float4 albedo = LOAD_FRAMEBUFFER_INPUT(0, i.vertex.xyz);
+				float4 emission = LOAD_FRAMEBUFFER_INPUT(1, i.vertex.xyz);
 
 				return albedo + emission;
 			}

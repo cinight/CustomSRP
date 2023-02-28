@@ -87,6 +87,9 @@ EditorBuildSettings:
     path: Assets/SRP0802_RenderGraph/SRP0802_RenderGraph.unity
     guid: 5b74aeb55b3928f4eaf3802b4ba0685c
   - enabled: 1
+    path: Assets/SRP0802_RenderGraph_RasterCommandBuffer/SRP0802_RenderGraph_RasterCommandBuffer.unity
+    guid: 723a5814e599d564e85687103a456280
+  - enabled: 1
     path: Assets/SRP0803_MultiRenderTarget/SRP0803_MultiRenderTarget.unity
     guid: 5a5bfa29f5ab44c4b9fb7243db2bfe22
   - enabled: 1
@@ -105,3 +108,4 @@ EditorBuildSettings:
     path: Assets/SRP1003_DefaultShaders/SRP1003_DefaultShaders.unity
     guid: a528bfc08fcb70b49bf234680e6636f2
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0

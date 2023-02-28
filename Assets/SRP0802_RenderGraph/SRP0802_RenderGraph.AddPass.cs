@@ -15,6 +15,7 @@ public partial class SRP0802_RenderGraph
     {
         public TextureHandle m_Albedo;
         public TextureHandle m_Emission;
+        public TextureHandle m_CameraTarget;
     }
 
     public void Render_SRP0802_AddPass(RenderGraph graph, TextureHandle albedo, TextureHandle emission)
@@ -26,13 +27,14 @@ public partial class SRP0802_RenderGraph
             //Textures
             passData.m_Albedo = builder.ReadTexture(albedo);
             passData.m_Emission = builder.ReadTexture(emission);
+            passData.m_CameraTarget = graph.ImportBackbuffer(BuiltinRenderTextureType.CameraTarget);
             
             //Builder
             builder.SetRenderFunc((SRP0802_AddPassData data, RenderGraphContext context) => 
             {
                 m_material.SetTexture("_CameraAlbedoTexture",data.m_Albedo);
                 m_material.SetTexture("_CameraEmissionTexture",data.m_Emission);
-                context.cmd.Blit( null, BuiltinRenderTextureType.CameraTarget, m_material );
+                context.cmd.Blit( null, passData.m_CameraTarget, m_material ); //
             });
         }
     }

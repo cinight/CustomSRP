@@ -38,10 +38,8 @@
 				return o;
 			}
 
-			CBUFFER_START(UnityPerMaterial)
 			sampler2D _CameraAlbedoTexture;
 			sampler2D _CameraEmissionTexture;
-			CBUFFER_END
 
 			float4 frag (v2f i) : SV_Target
 			{
