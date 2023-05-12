@@ -1,7 +1,7 @@
 # CustomSRP
 A new SRP from scratch
 
-Unity version : 2023.1.0b3+
+Unity version : 2023.1.0b17+
 Checkout to branches for older versions
 
 Tested with : Win DX11

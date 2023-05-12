@@ -1,4 +1,4 @@
-//This is copy from https://github.com/Unity-Technologies/Graphics/blob/graphics/hrnext/com.unity.render-pipelines.universal/ShaderLibrary/UniversalDOTSInstancing.hlsl
+//This is copy from https://github.com/Unity-Technologies/Graphics/blob/2023.1/staging/Packages/com.unity.render-pipelines.universal/ShaderLibrary/UniversalDOTSInstancing.hlsl
 
 #ifndef UNIVERSAL_DOTS_INSTANCING_INCLUDED
 #define UNIVERSAL_DOTS_INSTANCING_INCLUDED
@@ -15,7 +15,6 @@ UNITY_DOTS_INSTANCING_START(BuiltinPropertyMetadata)
     UNITY_DOTS_INSTANCED_PROP(float3x4, unity_WorldToObject)
     UNITY_DOTS_INSTANCED_PROP(float4,   unity_LODFade)
     UNITY_DOTS_INSTANCED_PROP(float4,   unity_RenderingLayer)
-    UNITY_DOTS_INSTANCED_PROP(float4,   unity_ProbesOcclusion)
     UNITY_DOTS_INSTANCED_PROP(float4,   unity_SpecCube0_HDR)
     UNITY_DOTS_INSTANCED_PROP(float4,   unity_LightmapST)
     UNITY_DOTS_INSTANCED_PROP(float4,   unity_LightmapIndex)
@@ -27,7 +26,6 @@ UNITY_DOTS_INSTANCING_START(BuiltinPropertyMetadata)
 UNITY_DOTS_INSTANCING_END(BuiltinPropertyMetadata)
 
 #define unity_LODFade               UNITY_ACCESS_DOTS_INSTANCED_PROP(float4,   unity_LODFade)
-#define unity_ProbesOcclusion       UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_CUSTOM_DEFAULT(float4, unity_ProbesOcclusion, unity_DOTS_ProbesOcclusion)
 #define unity_SpecCube0_HDR         UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_CUSTOM_DEFAULT(float4, unity_SpecCube0_HDR, unity_DOTS_SpecCube0_HDR)
 #define unity_LightmapST            UNITY_ACCESS_DOTS_INSTANCED_PROP(float4,   unity_LightmapST)
 #define unity_LightmapIndex         UNITY_ACCESS_DOTS_INSTANCED_PROP(float4,   unity_LightmapIndex)
@@ -39,11 +37,13 @@ UNITY_DOTS_INSTANCING_END(BuiltinPropertyMetadata)
 #define unity_SHBg                  LoadDOTSInstancedData_SHBg()
 #define unity_SHBb                  LoadDOTSInstancedData_SHBb()
 #define unity_SHC                   LoadDOTSInstancedData_SHC()
+#define unity_ProbesOcclusion       LoadDOTSInstancedData_ProbesOcclusion()
 #define unity_LightData             LoadDOTSInstancedData_LightData()
 #define unity_WorldTransformParams  LoadDOTSInstancedData_WorldTransformParams()
 #define unity_RenderingLayer        LoadDOTSInstancedData_RenderingLayer()
 
 #define UNITY_SETUP_DOTS_SH_COEFFS  SetupDOTSSHCoeffs(UNITY_DOTS_INSTANCED_METADATA_NAME(SH, unity_SHCoefficients))
+#define UNITY_SETUP_DOTS_RENDER_BOUNDS  SetupDOTSRendererBounds(UNITY_DOTS_MATRIX_M)
 
 // Not supported by BatchRendererGroup. Just define them as constants.
 // ------------------------------------------------------------------------------
@@ -69,6 +69,7 @@ int unity_SubmeshIndex;
 #else
 
 #define unity_SelectionID _SelectionID
+#define UNITY_SETUP_DOTS_RENDER_BOUNDS
 
 #endif
 
