@@ -1,9 +1,6 @@
-using Unity.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Experimental.Rendering.RenderGraphModule;
-using UnityEngine.Experimental.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
 
 // PIPELINE ADD PASS --------------------------------------------------------------------------------------------
 // This pass does a image effect that Albedo + Emission = final color
@@ -28,6 +25,9 @@ public partial class SRP0802_RenderGraph
             passData.m_Albedo = builder.ReadTexture(albedo);
             passData.m_Emission = builder.ReadTexture(emission);
             passData.m_CameraTarget = graph.ImportBackbuffer(BuiltinRenderTextureType.CameraTarget);
+            
+            // Let RenderGraph know what textures we are reading and writing (visible on Render Graph viewer)
+            builder.UseColorBuffer(passData.m_CameraTarget,0);
             
             //Builder
             builder.SetRenderFunc((SRP0802_AddPassData data, RenderGraphContext context) => 

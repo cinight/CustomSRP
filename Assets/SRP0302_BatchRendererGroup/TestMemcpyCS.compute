@@ -1,0 +1,21 @@
+// This is copied from https://github.com/Unity-Technologies/Graphics/blob/master/Tests/SRPTests/Projects/BatchRendererGroup_URP/Assets/SampleScenes/SimpleExample/TestMemcpyCS.compute
+
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+ByteAddressBuffer src;
+RWByteAddressBuffer dst;
+
+uniform uint dstOffset;
+uniform uint dstSize;
+
+[numthreads(64,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    uint tid = id.x;
+
+    uint offset = tid * 4;
+
+    if (offset < dstSize)
+        dst.Store(dstOffset + offset, src.Load(offset));
+}

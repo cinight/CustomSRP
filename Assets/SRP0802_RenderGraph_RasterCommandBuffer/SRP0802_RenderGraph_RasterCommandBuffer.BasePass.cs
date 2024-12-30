@@ -1,8 +1,7 @@
-using Unity.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Experimental.Rendering.RenderGraphModule;
+using UnityEngine.Rendering.RenderGraphModule;
+
 using UnityEngine.Experimental.Rendering;
 
 // PIPELINE BASE PASS --------------------------------------------------------------------------------------------
@@ -20,7 +19,6 @@ public partial class SRP0802_RenderGraph_RasterCommandBuffer
         public RendererListHandle m_renderList_transparent;
         public TextureHandle m_Albedo;
         public TextureHandle m_Emission;
-        public TextureHandle m_Depth;
     }
 
     private TextureHandle CreateColorTexture(RenderGraph graph, Camera camera, string name)
@@ -59,15 +57,19 @@ public partial class SRP0802_RenderGraph_RasterCommandBuffer
 
     public SRP0802_BasePassData Render_SRP0802_BasePass(Camera camera, RenderGraph graph, CullingResults cull, ScriptableRenderContext renderContext)
     {
+        //Textures - Multi-RenderTarget
+        TextureHandle Albedo = CreateColorTexture(graph,camera,"Albedo");
+        TextureHandle Emission = CreateColorTexture(graph,camera,"Emission");
+        TextureHandle Depth = CreateDepthTexture(graph,camera);
+        
         using (var builder = graph.AddRasterRenderPass<SRP0802_BasePassData>( "Base Pass", out var passData, new ProfilingSampler("Base Pass Profiler" ) ) )
         {
-            //Textures - Multi-RenderTarget
-            TextureHandle Albedo = CreateColorTexture(graph,camera,"Albedo");
-            passData.m_Albedo = builder.UseTextureFragment(Albedo,0,IBaseRenderGraphBuilder.AccessFlags.Write);
-            TextureHandle Emission = CreateColorTexture(graph,camera,"Emission");
-            passData.m_Emission = builder.UseTextureFragment(Emission,1,IBaseRenderGraphBuilder.AccessFlags.Write);
-            TextureHandle Depth = CreateDepthTexture(graph,camera);
-            passData.m_Depth = builder.UseTextureFragmentDepth(Depth, IBaseRenderGraphBuilder.AccessFlags.Write);
+            passData.m_Albedo = Albedo;
+            passData.m_Emission = Emission;
+            
+            builder.SetRenderAttachment(Albedo,0);
+            builder.SetRenderAttachment(Emission,1);
+            builder.SetRenderAttachmentDepth(Depth);
 
             //Renderers
             UnityEngine.Rendering.RendererUtils.RendererListDesc rendererDesc_base_Opaque = new UnityEngine.Rendering.RendererUtils.RendererListDesc(m_PassName1,cull,camera);

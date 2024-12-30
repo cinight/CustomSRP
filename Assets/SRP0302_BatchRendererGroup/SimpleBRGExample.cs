@@ -1,4 +1,5 @@
 //This is from the BRG API sample scenes in https://github.com/Unity-Technologies/Graphics/tree/graphics/hrnext/TestProjects/UniversalHybridTest/Assets/SampleScenes
+// https://github.com/Unity-Technologies/Graphics/blob/master/Tests/SRPTests/Projects/BatchRendererGroup_URP/Assets/SampleScenes/SimpleExample/SimpleBRGExample.cs
 
 using System;
 using Unity.Collections;
@@ -17,10 +18,12 @@ public class SimpleBRGExample : MonoBehaviour
     // Set this to a suitable Material via the Inspector, such as a default material that
     // uses Universal Render Pipeline/Lit
     public Material material;
+    public ComputeShader memcpy;
 
     private BatchRendererGroup m_BRG;
 
     private GraphicsBuffer m_InstanceData;
+    private GraphicsBuffer m_CopySrc;
     private BatchID m_BatchID;
     private BatchMeshID m_MeshID;
     private BatchMaterialID m_MaterialID;
@@ -32,6 +35,14 @@ public class SimpleBRGExample : MonoBehaviour
     private const int kBytesPerInstance = (kSizeOfPackedMatrix * 2) + kSizeOfFloat4;
     private const int kExtraBytes = kSizeOfMatrix * 2;
     private const int kNumInstances = 3;
+
+    private bool UseConstantBuffer => BatchRendererGroup.BufferTarget == BatchBufferTarget.ConstantBuffer;
+
+    // Offset should be divisible by 64, 48 and 16
+    // These can be edited to test nonzero GLES buffer offsets.
+    private int BufferSize(int bufferCount) => bufferCount * sizeof(int);
+    private int BufferOffset => 0;
+    private int BufferWindowSize => UseConstantBuffer ? BatchRendererGroup.GetConstantBufferMaxWindowSize() : 0;
 
     // Unity provided shaders such as Universal Render Pipeline/Lit expect
     // unity_ObjectToWorld and unity_WorldToObject in a special packed 48 byte
@@ -70,8 +81,20 @@ public class SimpleBRGExample : MonoBehaviour
         }
     }
 
+    // Raw buffers are allocated in ints, define an utility method to compute the required
+    // amount of ints for our data.
+    int BufferCountForInstances(int bytesPerInstance, int numInstances, int extraBytes = 0)
+    {
+        // Round byte counts to int multiples
+        bytesPerInstance = (bytesPerInstance + sizeof(int) - 1) / sizeof(int) * sizeof(int);
+        extraBytes = (extraBytes + sizeof(int) - 1) / sizeof(int) * sizeof(int);
+        int totalBytes = bytesPerInstance * numInstances + extraBytes;
+        return totalBytes / sizeof(int);
+    }
+
     // During initialization, we will allocate all required objects, and set up our custom instance data.
-    void Start()
+    // Use OnEnable() instead of Start() so we also get a call when a domain reload happens.
+    void OnEnable()
     {
         // Create the BatchRendererGroup and register assets
         m_BRG = new BatchRendererGroup(this.OnPerformCulling, IntPtr.Zero);
@@ -79,8 +102,16 @@ public class SimpleBRGExample : MonoBehaviour
         m_MaterialID = m_BRG.RegisterMaterial(material);
 
         // Create the buffer that holds our instance data
-        m_InstanceData = new GraphicsBuffer(GraphicsBuffer.Target.Raw,
-            (kExtraBytes + kBytesPerInstance * kNumInstances) / sizeof(int),
+        var target = GraphicsBuffer.Target.Raw;
+        if (SystemInfo.graphicsDeviceType is GraphicsDeviceType.OpenGLCore or GraphicsDeviceType.OpenGLES3)
+            target |= GraphicsBuffer.Target.Constant;
+
+        int bufferCount = BufferCountForInstances(kBytesPerInstance, kNumInstances, kExtraBytes);
+        m_CopySrc = new GraphicsBuffer(target,
+            bufferCount,
+            sizeof(int));
+        m_InstanceData = new GraphicsBuffer(target,
+            BufferSize(bufferCount) / sizeof(int),
             sizeof(int));
 
         // Place one zero matrix at the start of the instance data buffer, so loads from address 0 will return zero
@@ -134,10 +165,17 @@ public class SimpleBRGExample : MonoBehaviour
         uint byteAddressColor = byteAddressWorldToObject + kSizeOfPackedMatrix * kNumInstances;
 
         // Upload our instance data to the GraphicsBuffer, from where the shader can load them.
-        m_InstanceData.SetData(zero, 0, 0, 1);
-        m_InstanceData.SetData(objectToWorld, 0, (int)(byteAddressObjectToWorld / kSizeOfPackedMatrix), objectToWorld.Length);
-        m_InstanceData.SetData(worldToObject, 0, (int)(byteAddressWorldToObject / kSizeOfPackedMatrix), worldToObject.Length);
-        m_InstanceData.SetData(colors, 0, (int)(byteAddressColor / kSizeOfFloat4), colors.Length);
+        m_CopySrc.SetData(zero, 0, 0, 1);
+        m_CopySrc.SetData(objectToWorld, 0, (int)((byteAddressObjectToWorld + 0) / kSizeOfPackedMatrix), objectToWorld.Length);
+        m_CopySrc.SetData(worldToObject, 0, (int)((byteAddressWorldToObject + 0)  / kSizeOfPackedMatrix), worldToObject.Length);
+        m_CopySrc.SetData(colors, 0, (int)((byteAddressColor + 0)  / kSizeOfFloat4), colors.Length);
+
+        int dstSize = m_CopySrc.count * m_CopySrc.stride;
+        memcpy.SetBuffer(0, "src", m_CopySrc);
+        memcpy.SetBuffer(0, "dst", m_InstanceData);
+        memcpy.SetInt("dstOffset", BufferOffset);
+        memcpy.SetInt("dstSize", dstSize);
+        memcpy.Dispatch(0, dstSize / (64 * 4) + 1, 1, 1);
 
         // Set up metadata values to point to the instance data. Set the most significant bit 0x80000000 in each,
         // which instructs the shader that the data is an array with one value per instance, indexed by the instance index.
@@ -154,7 +192,7 @@ public class SimpleBRGExample : MonoBehaviour
         // Finally, create a batch for our instances, and make the batch use the GraphicsBuffer with our
         // instance data, and the metadata values that specify where the properties are. Note that
         // we do not need to pass any batch size here.
-        m_BatchID = m_BRG.AddBatch(metadata, m_InstanceData.bufferHandle);
+        m_BatchID = m_BRG.AddBatch(metadata, m_InstanceData.bufferHandle, (uint)BufferOffset, (uint)BufferWindowSize);
     }
 
     // We need to dispose our GraphicsBuffer and BatchRendererGroup when our script is no longer used,
@@ -162,6 +200,7 @@ public class SimpleBRGExample : MonoBehaviour
     // BatchRendererGroup are automatically disposed when disposing the BatchRendererGroup.
     private void OnDisable()
     {
+        m_CopySrc.Dispose();
         m_InstanceData.Dispose();
         m_BRG.Dispose();
     }
@@ -194,6 +233,7 @@ public class SimpleBRGExample : MonoBehaviour
         drawCommands->drawCommands = (BatchDrawCommand*)UnsafeUtility.Malloc(UnsafeUtility.SizeOf<BatchDrawCommand>(), alignment, Allocator.TempJob);
         drawCommands->drawRanges = (BatchDrawRange*)UnsafeUtility.Malloc(UnsafeUtility.SizeOf<BatchDrawRange>(), alignment, Allocator.TempJob);
         drawCommands->visibleInstances = (int*)UnsafeUtility.Malloc(kNumInstances * sizeof(int), alignment, Allocator.TempJob);
+        drawCommands->drawCommandPickingInstanceIDs = null;
 
         drawCommands->drawCommandCount = 1;
         drawCommands->drawRangeCount = 1;
@@ -205,13 +245,14 @@ public class SimpleBRGExample : MonoBehaviour
 
         // Configure our single draw command to draw kNumInstances instances
         // starting from offset 0 in the array, using the batch, material and mesh
-        // IDs that we registered in the Start() method. No special flags are set.
+        // IDs that we registered in the OnEnable() method. No special flags are set.
         drawCommands->drawCommands[0].visibleOffset = 0;
         drawCommands->drawCommands[0].visibleCount = kNumInstances;
         drawCommands->drawCommands[0].batchID = m_BatchID;
         drawCommands->drawCommands[0].materialID = m_MaterialID;
         drawCommands->drawCommands[0].meshID = m_MeshID;
         drawCommands->drawCommands[0].submeshIndex = 0;
+        drawCommands->drawCommands[0].splitVisibilityMask = 0xff;
         drawCommands->drawCommands[0].flags = 0;
         drawCommands->drawCommands[0].sortingPosition = 0;
 
@@ -223,6 +264,7 @@ public class SimpleBRGExample : MonoBehaviour
         // to the default zero values, except the renderingLayerMask which we have to set to all ones
         // so the instances will be drawn regardless of mask settings when rendering.
         drawCommands->drawRanges[0].filterSettings = new BatchFilterSettings { renderingLayerMask = 0xffffffff, };
+        drawCommands->drawRanges[0].drawCommandsType = BatchDrawCommandType.Direct;
 
         // Finally, write the actual visible instance indices to their array. In a more complicated
         // implementation, this output would depend on what we determined to be visible, but in this example

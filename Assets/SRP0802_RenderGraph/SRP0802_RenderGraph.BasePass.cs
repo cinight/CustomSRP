@@ -1,9 +1,8 @@
-using Unity.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Experimental.Rendering.RenderGraphModule;
+
 using UnityEngine.Experimental.Rendering;
+using UnityEngine.Rendering.RenderGraphModule;
 
 // PIPELINE BASE PASS --------------------------------------------------------------------------------------------
 // This pass renders objects into 2 RenderTargets:

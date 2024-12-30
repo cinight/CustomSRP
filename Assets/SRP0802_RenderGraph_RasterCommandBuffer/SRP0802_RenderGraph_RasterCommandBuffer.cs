@@ -2,8 +2,8 @@ using Unity.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Experimental.Rendering.RenderGraphModule;
-using UnityEngine.Experimental.Rendering;
+
+using UnityEngine.Rendering.RenderGraphModule;
 
 // PIPELINE MAIN --------------------------------------------------------------------------------------------
 public partial class SRP0802_RenderGraph_RasterCommandBuffer : RenderPipeline
@@ -40,11 +40,10 @@ public partial class SRP0802_RenderGraph_RasterCommandBuffer : RenderPipeline
                 currentFrameIndex = Time.frameCount
             };
 
-            using (graph.RecordAndExecute(rgParams))
-            {
-                SRP0802_BasePassData basePassData = Render_SRP0802_BasePass(camera,graph,cull,context); //BasePass
-                Render_SRP0802_AddPass(graph,basePassData.m_Albedo,basePassData.m_Emission); //AddPass
-            }
+            graph.BeginRecording(rgParams);
+            SRP0802_BasePassData basePassData = Render_SRP0802_BasePass(camera,graph,cull,context); //BasePass
+            Render_SRP0802_AddPass(graph,basePassData.m_Albedo,basePassData.m_Emission); //AddPass
+            graph.EndRecordingAndExecute();
 
             context.ExecuteCommandBuffer(cmdRG);
             CommandBufferPool.Release(cmdRG);
