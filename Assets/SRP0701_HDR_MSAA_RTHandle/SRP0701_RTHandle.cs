@@ -106,8 +106,8 @@ public class SRP0701_RTHandleInstance : RenderPipeline
             //Draw RendererLists
             CommandBuffer cmdRender = new CommandBuffer();
             cmdRender.name = "Draw RendererLists";
-            CoreUtils.DrawRendererList(context,cmdRender,rdlist_Opaque);
-            CoreUtils.DrawRendererList(context,cmdRender,rdlist_Transparent);
+            CoreUtils.DrawRendererList(cmdRender,rdlist_Opaque);
+            CoreUtils.DrawRendererList(cmdRender,rdlist_Transparent);
             context.ExecuteCommandBuffer(cmdRender);
             cmdRender.Release();
 

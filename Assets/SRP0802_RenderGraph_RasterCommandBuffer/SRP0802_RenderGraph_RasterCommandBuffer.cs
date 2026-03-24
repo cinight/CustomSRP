@@ -1,5 +1,3 @@
-using Unity.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -30,6 +28,9 @@ public partial class SRP0802_RenderGraph_RasterCommandBuffer : RenderPipeline
             //Camera setup some builtin variables e.g. camera projection matrices etc
             context.SetupCameraProperties(camera);
 
+            //Setup
+            SetUpAddPass(camera);
+
             //Execute graph 
             CommandBuffer cmdRG = CommandBufferPool.Get("ExecuteRenderGraph");
             RenderGraphParameters rgParams = new RenderGraphParameters()
@@ -59,6 +60,7 @@ public partial class SRP0802_RenderGraph_RasterCommandBuffer : RenderPipeline
 
     protected override void Dispose(bool disposing)
     {
+        CleanupAddPass();
         graph.Cleanup();
         graph = null;
     }
